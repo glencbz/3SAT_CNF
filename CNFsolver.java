@@ -9,13 +9,21 @@ public class CNFsolver {
 	public static void main(String[] args){
 		CNFsolver test = new CNFsolver(CNFparser.parseDimacsCnfFile("src/cnf.txt"));
 		System.out.println(test.getCNF());
-		test.getCNF().computeOccurrenceMap();
-		test.getCNF().createResolution();
-		System.out.println(test.getCNF());
-		System.out.println(test.getCNF().eliminateUnitClauses());
-		System.out.println(test.getCNF());
-		int[] testVars = {0,1,0,1};
-		System.out.println(verifyAssignment(testVars));
+		test.getCNF().initialise();
+		for(int i : test.getCNF().getKnownAssignments())
+			System.out.print(i +",");
+		System.out.println("");
+		int[] guess = test.getCNF().getKnownAssignments();
+		for(int i = 0; i < guess.length; i++){
+			if (guess[i] == 0)
+				guess[i] = test.getCNF().randomAssignment1();
+		}
+		
+		for(int i : guess)
+			System.out.print(i + ",");
+		System.out.println("");
+		
+		System.out.println(test.verifyAssignment(guess));
 	}
 	
 	public static int[] generateRandomAssignment(int numVars){
@@ -26,8 +34,8 @@ public class CNFsolver {
 	}
 	
 	/**
-	 * Takes in an assignment in the form of an array of 0s and 1s.
-	 * 
+	 * Takes in an assignment in the form of an array of -1s and 1s.
+	 * Tested and works
 	 * @param assignment
 	 * @return Whether the assignment satisfies the formula
 	 */
@@ -46,7 +54,7 @@ public class CNFsolver {
 						satisfiedClauses[j-1] = 1; //set the appropriate entry in satisfiedClauses (the entry j - 1corresponding to the int in occurenceMap[i]) to 1
 					}
 				}
-				if(assignment[i] == 0){
+				if(assignment[i] == -1){
 					for(int j: CNF.getOccurrenceMap()[i + CNF.getNumVariables()]){ //check the list in the occurrence map corresponding to -i
 						satisfiedClauses[j-1] = 1; //set the appropriate entry in satisfiedClauses (the entry j - 1corresponding to the int in occurenceMap[i + numVars]) to 1
 					}
