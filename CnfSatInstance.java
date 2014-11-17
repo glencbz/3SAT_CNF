@@ -82,9 +82,13 @@ public class CnfSatInstance
 		    public void setNumClauses(int numClauses)
 		    {
 		    	this.numClauses = numClauses;
-	}
+		    }
 
-		    /**
+		    public List<Integer>[] getOccurrenceMap() {
+				return occurrenceMap;
+			}
+
+			/**
 		     * Takes two clauses and computes their resolvent.
 		     * The resolvent is the clause (C1 - v) union (C2 - ~v) where C1 and C2 have only v as a
 		     * common variable. This is useful as any assignment that satisfies C1 and C2 must
@@ -170,6 +174,55 @@ public class CnfSatInstance
 		    		}
 		    	}
 		    	return resFound;
+		    }
+		    
+		    /**
+		     * Generates the sentence G given var for the CNF SAT sentence G
+		     * and a variable var. This is done by removing all clauses with var
+		     * and removing neg(var) from all clauses containing it.
+		     * @param var Given variable
+		     */
+		    public void givenVar(Integer var){
+		    	int givenVariable = Math.abs((int) var) > 0 ? (int) var : (int) var + numVars;
+		    	for(int i = 1; i <= occurrenceMap[givenVariable - 1].size(); i++){
+		    		clauses.remove(clauses.get(occurrenceMap[givenVariable - 1].get(i - 1) - 1));
+		    		numClauses--;
+		    	}
+		    	
+		    	int negGivenVariable = givenVariable > numVars ? givenVariable - numVars : -givenVariable;
+		    	
+		    	for(List<Integer> l : clauses){
+		    		for(int i = 1; i <= l.size(); i++){
+		    			if((int)l.get(i - 1) == negGivenVariable){
+		    				l.remove(i - 1);
+		    			}
+		    		}
+		    	}
+		    	computeOccurrenceMap();
+		    }
+		    /**
+		     * Removes unit clauses from the sentence by repeatedly calling the givenVar() function
+		     * for every unit clause found. Return value gives the variables in the unit clauses
+		     * found so that the assignment can be modified accodingly.
+		     * Tested and works
+		     * @return Variables of unit clauses
+		     */
+		    public List<Integer> eliminateUnitClauses(){
+		    	boolean unitClauseFound = true;
+		    	List<Integer> foundVars = new LinkedList<Integer>();
+		    	while(unitClauseFound) {
+		    		unitClauseFound = false;
+			    	for(List<Integer> l : clauses){
+			    		System.out.println(l);
+			    		if(l.size() == 1){
+			    			foundVars.add(l.get(0));
+			    			givenVar(l.get(0));
+			    			unitClauseFound = true;
+			    			break;
+			    		}
+		    		}
+		    	}
+		    	return foundVars;
 		    }
 		    
 		    public String toString(){
