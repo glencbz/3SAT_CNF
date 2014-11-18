@@ -11,12 +11,12 @@ public class CnfSatInstance
 	{
 			private int numClauses;
 		    private int numVars;
-		    
+		    private int[] knownAssignments = null;
 		    //TODO: possible time improvement, replace List implementation with Array implementation
 		    
 		    protected List<List<Integer>> clauses;
 		    protected List<Integer>[] occurrenceMap = null;
-	 
+		    protected List<List<Integer>> MICS = null;
 		    //  entries [0,...,numVars-1] for positive literals
 		    //  entries [numVars,...,2*numVars-1] for negative literals
 	   
@@ -28,10 +28,19 @@ public class CnfSatInstance
 		    	occurrenceMap = null;
 		    }
 		    
+		    /**
+		     * Public method that initialises the instance to make it able to run after parsing
+		     */
+		    public void initialise(){
+		    	knownAssignments = new int[numVars];
+		    	computeOccurrenceMap();
+		    	simplify();
+		    	computeOccurrenceMap();		    	
+		    }
 		    //generate lit -> clause map for lookup
 		    //caching this makes the computation of different views a lot faster
 		    @SuppressWarnings("unchecked")
-		    public void computeOccurrenceMap()
+		    private void computeOccurrenceMap()
 		    {
 		    	System.out.println("Generating occurrence map for " + (getNumVars() * 2) + " literals ... ");
 		    	occurrenceMap = (List<Integer>[]) new List[getNumVars() * 2];
@@ -84,7 +93,11 @@ public class CnfSatInstance
 		    	this.numClauses = numClauses;
 		    }
 
-		    public List<Integer>[] getOccurrenceMap() {
+		    public int[] getKnownAssignments() {
+				return knownAssignments;
+			}
+
+			public List<Integer>[] getOccurrenceMap() {
 				return occurrenceMap;
 			}
 
@@ -94,12 +107,14 @@ public class CnfSatInstance
 		     * common variable. This is useful as any assignment that satisfies C1 and C2 must
 		     * satisfy their resolvent as well.
 		     * 
+		     * Tested and works
+		     * 
 		     * @param clause1 clause containing var
 		     * @param clause2 clause containing negation of var
 		     * @param var common variable to both clauses
 		     * @return the resolvent of clause1 and clause2
 		     */
-		    public List<Integer> resolvent(List<Integer> clause1, List<Integer> clause2, Integer var){
+		    private List<Integer> resolvent(List<Integer> clause1, List<Integer> clause2, Integer var){
 		    	List<Integer> resolvent = new LinkedList<Integer>();
 		    	boolean varPresent1 = false;
 		    	boolean varPresent2 = false;
@@ -163,7 +178,7 @@ public class CnfSatInstance
 			    				int commonVar = (int) checkResolvence(clauses.get(k - 1), clauses.get(j-1));
 			    				if(commonVar != 0){
 			    					List<Integer> res = resolvent(clauses.get(k-1), clauses.get(j-1), commonVar);
-			    					if(clauses.lastIndexOf(res) == -1){
+			    					if(clauses.lastIndexOf(res) == -1 && res.size() <= numVars){
 			    						clauses.add(res);
 			    						resFound = true;
 			    						numClauses++;
@@ -173,16 +188,21 @@ public class CnfSatInstance
 		    			}
 		    		}
 		    	}
+		    	simplify();
 		    	return resFound;
 		    }
 		    
 		    /**
-		     * Generates the sentence G given var for the CNF SAT sentence G
-		     * and a variable var. This is done by removing all clauses with var
-		     * and removing neg(var) from all clauses containing it.
+		     * Modifies the formula G given var for the CNF SAT sentence G
+		     * and a variable var and recomputes the occurrence map.
+		     * This is done by removing all clauses with var and removing neg(var) 
+		     * from all clauses containing it. Eliminates variables in both 
+		     * eliminateUnitClauses() and eliminateTrivialities.
+		     * 
+		     * Tested and works
 		     * @param var Given variable
 		     */
-		    public void givenVar(Integer var){
+		    private void givenVar(Integer var){
 		    	int givenVariable = Math.abs((int) var) > 0 ? (int) var : (int) var + numVars;
 		    	for(int i = 1; i <= occurrenceMap[givenVariable - 1].size(); i++){
 		    		clauses.remove(clauses.get(occurrenceMap[givenVariable - 1].get(i - 1) - 1));
@@ -198,33 +218,125 @@ public class CnfSatInstance
 		    			}
 		    		}
 		    	}
+    			knownAssignments[Math.abs(var) - 1] = var < 0 ? -1: 1 ;
 		    	computeOccurrenceMap();
 		    }
 		    /**
 		     * Removes unit clauses from the sentence by repeatedly calling the givenVar() function
-		     * for every unit clause found. Return value gives the variables in the unit clauses
-		     * found so that the assignment can be modified accodingly.
-		     * Tested and works
-		     * @return Variables of unit clauses
+		     * for every unit clause found. Returns true if changes have been made
+		     * 
+		     * @return True if changes were made
 		     */
-		    public List<Integer> eliminateUnitClauses(){
+		    public boolean eliminateUnitClauses(){
 		    	boolean unitClauseFound = true;
-		    	List<Integer> foundVars = new LinkedList<Integer>();
-		    	while(unitClauseFound) {
-		    		unitClauseFound = false;
+		    	while(unitClauseFound) { //always called on the first iteration
+		    		unitClauseFound = false; //assume unit clause not found
 			    	for(List<Integer> l : clauses){
-			    		System.out.println(l);
 			    		if(l.size() == 1){
-			    			foundVars.add(l.get(0));
+			    			knownAssignments[l.get(0) - 1] = l.get(0) < 0 ? -1: 1 ;
 			    			givenVar(l.get(0));
 			    			unitClauseFound = true;
 			    			break;
 			    		}
 		    		}
 		    	}
-		    	return foundVars;
+		    	return unitClauseFound;
 		    }
 		    
+		    /**
+		     * Examines the formula for all occurrences of each variable.
+		     * If the variable occurs but not its negation or vice versa,
+		     * the variable is added to the array of known assignments and
+		     * removed from the formula.
+		     * 
+		     * @return Whether a triviality has been found
+		     */
+		    private boolean eliminateTrivialities(){
+		    	boolean trivialityFound = false;
+		    	for(int i = 0; i < numVars; i++){
+		    		if(!occurrenceMap[i].isEmpty() && occurrenceMap[i + numVars].isEmpty()){
+		    			givenVar(i + 1);
+		    			trivialityFound = true;
+		    		}else if(occurrenceMap[i].isEmpty() && !occurrenceMap[i + numVars].isEmpty()){
+		    			givenVar(-i - 1);
+		    			trivialityFound = true;
+		    		}
+		    	}
+		    	return trivialityFound;
+		    }
+
+		    private void simplify(){
+		    	while(eliminateUnitClauses() || eliminateTrivialities()){
+		    		
+		    	}
+		    }
+		    /**
+		     * Implements the brute force MICS generation and assignment guessing
+		     * algorithm as specified by Baumer and Schuler (2003) in Improving a probabilistic 3-SAT etc etc
+		     * MICS is stored in the CNF instance
+		     * @return Guess of assignment
+		     */
+/*
+		    public int[] bruteForce(){
+		    	MICS = new LinkedList<List<Integer>>();
+		    	int[] assignment = new int[numVars];
+		    	for(int i = 1; i <= numVars; i++){ //for each variable
+		    		
+		    		List<Integer> C = null;
+		    		List<Integer> CPrime = null;
+		    		for(List<Integer> c : clauses){//for each clause
+		    			//TODO: Implement the 2-lit clause implication chain that finds all cases of variable = 0 implies lit = 0
+		    			if(c.contains(i)){//if found a clause where variable = 0 implies lit = 0
+		    				C = c;
+		    				break;
+		    			}
+		    		}
+		    		
+		    		if(C == null){
+		    			assignment[i-1] = 0; //if clause C is not found, deterministically set x to 0
+		    		}else{ //otherwise
+			    		for(List<Integer> c : clauses){//for each clause
+			    			//TODO: Implement the 2-lit clause implication chain that finds all cases of variable = 1 implies lit = 0
+			    			if(c.contains(-i)){//if found a clause where variable = 1 implies lit = 0
+			    				CPrime = c;
+			    				break;
+			    			}
+			    		}
+			    		if(CPrime == null){
+			    			assignment[i-1] = 1;
+			    		}else
+			    			assignment[i-1] = randomAssignment1();
+		    		}
+		    		
+		    		if(assignment[i-1] == 0 && C != null){
+		    			MICS.add(C);
+		    		}
+		    	}
+		    }
+		    */
+		    
+ 		    public int randomAssignment1(){
+		    	return Math.random() > 0.5 ? 1 : -1;
+		    }
+
+		    public int[] randomAssignment2(){
+		    	double rand = Math.random();
+		    	int[] ret = {-1,-1};
+		    	if (rand < (double) 1 / 3){
+		    		ret[1] = 1;
+		    		return ret;
+		    	}
+		    	else if (rand >= (double) 1 / 3 && rand < (double) 2 / 3){
+		    		ret[0] = 1;
+		    		return ret;
+		    	}
+		    	else{
+		    		ret[0] = 1;
+		    		ret[1] = 1;
+		    		return ret;
+		    	}
+		    }
+		    		
 		    public String toString(){
 		    	return clauses.toString();
 		    }
