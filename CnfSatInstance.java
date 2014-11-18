@@ -42,9 +42,9 @@ public class CnfSatInstance
 		    @SuppressWarnings("unchecked")
 		    private void computeOccurrenceMap()
 		    {
-		    	System.out.println("Generating occurrence map for " + (getNumVars() * 2) + " literals ... ");
-		    	occurrenceMap = (List<Integer>[]) new List[getNumVars() * 2];
-		    	for (int i = 0; i < getNumVars() * 2; i++)
+//		    	System.out.println("Generating occurrence map for " + (getNumVars() * 2) + " literals ... ");
+		    	occurrenceMap = (List<Integer>[]) new List[numVars * 2];
+		    	for (int i = 0; i < numVars * 2; i++)
 		    	{
 		    		occurrenceMap[i] = new LinkedList<Integer>();
 		    	}
@@ -54,23 +54,18 @@ public class CnfSatInstance
 		    		for (int literal : clause)
 		    		{
 		    			int pos = literal;
-		    			if (literal < 0) pos = getNumVars() + Math.abs(literal);
+		    			if (literal < 0) pos = numVars + Math.abs(literal);
 		    			occurrenceMap[pos-1].add(i);
 		    		}
 		    	}
-		    	for(List<Integer> l : occurrenceMap)
-		    		System.out.println("Occurrence Map: " + l);
-		    	System.out.println("Ready!");
+//		    	for(List<Integer> l : occurrenceMap)
+//		    		System.out.println("Occurrence Map: " + l);
+//		    	System.out.println("Ready!");
 		    }
 		    
 		    public int getNumClauses()
 		    {
 		    	return numClauses;
-		    }
-	
-		    public int getNumVariables()
-		    {
-		    	return getNumVars();
 		    }
 	
 		    public List<List<Integer>> getClauses()
@@ -193,7 +188,7 @@ public class CnfSatInstance
 		    }
 		    
 		    /**
-		     * Modifies the formula G given var for the CNF SAT sentence G
+		     * Returns the formula G given var for the CNF SAT sentence G
 		     * and a variable var and recomputes the occurrence map.
 		     * This is done by removing all clauses with var and removing neg(var) 
 		     * from all clauses containing it. Eliminates variables in both 
@@ -202,12 +197,17 @@ public class CnfSatInstance
 		     * Tested and works
 		     * @param var Given variable
 		     */
-		    private void givenVar(Integer var){
-		    	int givenVariable = Math.abs((int) var) > 0 ? (int) var : (int) var + numVars;
+		    private List<List<Integer>> givenVar(Integer var){
+		    	int givenVariable = (int) var > 0 ? (int) var : Math.abs((int) var) + numVars;
+		    	LinkedList<List<Integer>> clausesToRemove = new LinkedList<List<Integer>>();
+		    	LinkedList<List<Integer>> copyOfClauses = new LinkedList<List<Integer>>(clauses);
+		    	
 		    	for(int i = 1; i <= occurrenceMap[givenVariable - 1].size(); i++){
-		    		clauses.remove(clauses.get(occurrenceMap[givenVariable - 1].get(i - 1) - 1));
-		    		numClauses--;
+		    		clausesToRemove.add(clauses.get(occurrenceMap[givenVariable - 1].get(i - 1) - 1));
 		    	}
+		    	
+		    	for(List<Integer> l : clausesToRemove)
+		    		copyOfClauses.remove(l);
 		    	
 		    	int negGivenVariable = givenVariable > numVars ? givenVariable - numVars : -givenVariable;
 		    	
@@ -219,7 +219,8 @@ public class CnfSatInstance
 		    		}
 		    	}
     			knownAssignments[Math.abs(var) - 1] = var < 0 ? -1: 1 ;
-		    	computeOccurrenceMap();
+		    	
+		    	return copyOfClauses;
 		    }
 		    /**
 		     * Removes unit clauses from the sentence by repeatedly calling the givenVar() function
@@ -234,7 +235,9 @@ public class CnfSatInstance
 			    	for(List<Integer> l : clauses){
 			    		if(l.size() == 1){
 			    			knownAssignments[l.get(0) - 1] = l.get(0) < 0 ? -1: 1 ;
-			    			givenVar(l.get(0));
+			    			this.clauses= givenVar(l.get(0));
+			    			this.numVars = clauses.size();
+			    			computeOccurrenceMap();
 			    			unitClauseFound = true;
 			    			break;
 			    		}
@@ -255,16 +258,21 @@ public class CnfSatInstance
 		    	boolean trivialityFound = false;
 		    	for(int i = 0; i < numVars; i++){
 		    		if(!occurrenceMap[i].isEmpty() && occurrenceMap[i + numVars].isEmpty()){
-		    			givenVar(i + 1);
+		    			this.clauses = givenVar(i + 1);
+		    			this.numClauses = clauses.size();
+		    			computeOccurrenceMap();
 		    			trivialityFound = true;
 		    		}else if(occurrenceMap[i].isEmpty() && !occurrenceMap[i + numVars].isEmpty()){
-		    			givenVar(-i - 1);
+		    			this.clauses = givenVar(-i - 1);
+		    			this.numClauses = clauses.size();
+		    			computeOccurrenceMap();
 		    			trivialityFound = true;
 		    		}
 		    	}
 		    	return trivialityFound;
 		    }
 
+		    //TODO: Add empty clause checking
 		    private void simplify(){
 		    	while(eliminateUnitClauses() || eliminateTrivialities()){
 		    		

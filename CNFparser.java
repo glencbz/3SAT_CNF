@@ -49,8 +49,9 @@ public class CNFparser
 	            while (in.hasNext())
 	            {
 	                currentLine = in.nextLine();
-	                tokens = currentLine.split(" ");
-	                if (!tokens[0].equals("c"))
+	                tokens = currentLine.split("\\s+");
+	                
+	                if (!tokens[0].equals("c") && !tokens[0].equals(""))
 	                {
 	                    for (int i = 0; i < tokens.length; i++)
 	                    {
