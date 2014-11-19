@@ -17,6 +17,7 @@ public class CNFSatInstance
 		    
 		    protected int[][] clauses = null;
 		    protected int[][] occurrenceMap = null;
+		    protected List<Integer> clauseCache = null;
 		    
 		    public CNFSatInstance(){
 		    	setNumClauses(0);
@@ -97,6 +98,38 @@ public class CNFSatInstance
 		    	}
 		    	return ret;
 		    }
+		    
+		    public int[] getOccurringClauses(List<List<Integer>> clauses, int literal){
+		    	List<Integer> occurringClauses = new ArrayList<Integer>();
+		    	for (int i = 0; i < clauses.size(); i++)
+		    	{
+		    		for (int lit : clauses.get(i))
+		    		{
+		    			if(lit == literal){
+		    				occurringClauses[i] = 1;
+		    			}
+		    		}
+		    	}
+		    	return occurringClauses;
+		    }
+		    
+		    public int getNumOccurringClauses(List<List<Integer>> clauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : getOccurringClauses(clauses, literal)){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    
+		    public int getNumOccurringClauses(List<Integer> occurringClauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : occurringClauses){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    
+		    		    
 		    
 		    /**
 		     * Creates a 2D array Map of numClauses by numVars * 2
@@ -216,11 +249,9 @@ public class CNFSatInstance
 		    		int numPosOccurr = getNumOccurringClauses(newFormula, i);
 		    		int numNegOccurr = getNumOccurringClauses(newFormula, -i);
 		    		if(numPosOccurr == 0 && numNegOccurr != 0){ //if the literal i does not appear
-		    			System.out.println(i);
 		    			newFormula = givenVar(newFormula, -(i + 1));
 		    		}
-		    		else if( == 0){
-		    			System.out.println(-i);
+		    		else if(numPosOccurr != 0 && numNegOccurr == 0){
 		    			newFormula = givenVar(newFormula, i + 1);
 		    		}
 		    	}
@@ -228,6 +259,13 @@ public class CNFSatInstance
 		    	return newFormula;
 		    }
 
+		    /**
+		     * Uses array implementation. Requires allocation and deallocation of 
+		     * large amounts of space due to the array implementations that remove the variables.
+		     * 
+		     * @param clauses
+		     * @return
+		     */
 		    public int[][] simplify(int[][] clauses){
 		    	boolean changesMade = true;
 		    	int[][] newFormula = clauses;
@@ -245,6 +283,15 @@ public class CNFSatInstance
 		    		}
 		    	}
 		    	return newFormula;
+		    }
+	
+		    /**
+		     * Takes in a cachedClause list and modifies it directly for faster processing
+		     * 
+		     * @param cachedClause
+		     * @return
+		     */
+		    public List<List<Integer>> cachedSimplify(List<Integer> cachedClause){
 		    }
 		    
 		    /*			
