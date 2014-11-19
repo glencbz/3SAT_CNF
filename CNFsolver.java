@@ -1,31 +1,36 @@
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Random;
 
 public class CNFsolver {
 	
 	CnfSatInstance CNF = null;
 
+	CNFsolver(CnfSatInstance CNF){
+		this.CNF = CNF;
+		CNF.initialise();
+	}
+	
 	public static void main(String[] args){
 		
-		CNFsolver test = new CNFsolver(CNFparser.parseDimacsCnfFile("src/cnf.txt"));
-		System.out.println(test.getCNF());
-		test.getCNF().initialise();
-		for(int i : test.getCNF().getKnownAssignments())
-			System.out.print(i +",");
-		System.out.println("");
-		int[] guess = test.getCNF().getKnownAssignments();
-		for(int i = 0; i < guess.length; i++){
-			if (guess[i] == 0)
-				guess[i] = test.getCNF().randomAssignment1();
-		}
-		
-		for(int i : guess)
-			System.out.print(i + ",");
-		System.out.println("");
-		
-		System.out.println(test.verifyAssignment(guess));
+//		CNFsolver test = new CNFsolver(CNFparser.parseDimacsCnfFile("src/cnf.txt"));
+//		System.out.println(test.getCNF());
+//		test.getCNF().initialise();
+//		for(int i : test.getCNF().getKnownAssignments())
+//			System.out.print(i +",");
+//		System.out.println("");
+//		int[] guess = test.getCNF().getKnownAssignments();
+//		for(int i = 0; i < guess.length; i++){
+//			if (guess[i] == 0)
+//				guess[i] = test.getCNF().randomAssignment1();
+//		}
+//		
+//		for(int i : guess)
+//			System.out.print(i + ",");
+//		System.out.println("");
+//		
+//		System.out.println(test.verifyAssignment(guess));
 	}
 
 	public boolean verifyAssignment(int[] assignment){
@@ -57,10 +62,42 @@ public class CNFsolver {
 			return true;
 		}
 	}
-	
-	CNFsolver(CnfSatInstance CNF){
-		this.CNF = CNF;
-		CNF.initialise();
+
+	/**
+	 * If there is an unsatisfied clause, returns the first unsatisfied clause found.
+	 * Returns 0 if all are satisfied, -1 if error
+	 * @param assignment
+	 * @return
+	 */
+	public int unsatisfiedClause(int[] assignment){
+		if(CNF.getNumVars() != assignment.length){
+			 System.err.println("Error. Assignment does not contain the required number of variables");
+			 return -1;
+		}
+		else{
+			int[] satisfiedClauses = new int[CNF.getNumClauses()];
+			
+			for(int i = 0; i < assignment.length; i++){
+				if(assignment[i] == 1){ //if i is true
+					for(int j: CNF.getOccurrenceMap()[i]){ //check the list in the occurrence map corresponding to i
+						satisfiedClauses[j-1] = 1; //set the appropriate entry in satisfiedClauses (the entry j - 1corresponding to the int in occurenceMap[i]) to 1
+					}
+				}
+				if(assignment[i] == -1){
+					for(int j: CNF.getOccurrenceMap()[i + CNF.getNumVars()]){ //check the list in the occurrence map corresponding to -i
+						satisfiedClauses[j-1] = 1; //set the appropriate entry in satisfiedClauses (the entry j - 1corresponding to the int in occurenceMap[i + numVars]) to 1
+					}
+					
+				}
+			}
+			
+			for (int i = 0; i < satisfiedClauses.length; i++){
+				if (satisfiedClauses[i] != 1)
+					return i + 1;
+			}
+			return 0;
+		}
+
 	}
 
 	public CnfSatInstance getCNF() {
@@ -87,7 +124,7 @@ public class CNFsolver {
 	/**Generates a random vector of n -1s and 1s
 	 * 
 	 */
-	public static int[] randomVector(int numVars){
+	public int[] randomVector(int numVars){
 		int[] ret = new int[numVars];
 		for(int i = 0; i < numVars; i++){
 			ret[i] = Math.random() > 0.5 ? 1 : -1;
@@ -153,22 +190,7 @@ public class CNFsolver {
     /**
      * Performs the PPSZ search algorithm to find a satisfying assignment
      */
-    public void PPSZsearch(CnfSatInstance CNF){
-    	int numVars = CNF.getNumVars();
-    	boolean satisfied = false;
-    	for(int i = 0; i <= 1000000; i++){
-    		int [] guess = PPSZmodify(CNF, permutatePi(numVars), randomVector(numVars));
-    		if(verifyAssignment(guess)){
-    			satisfied = true;
-    			System.out.println("SATISFIED BIATCH");
-    			for (int j : guess)
-    				System.out.print(j + ",");
-    			System.out.println("");
-    			break;
-    		}
-    	}
-    	System.out.println(satisfied ? "": "UNSATISFIABLE :(");
-    }
+
 	/**
 	 * Performs an iteration of the Modify procedure of
 	 * PPSZ
@@ -177,14 +199,15 @@ public class CNFsolver {
 	 * @param initialAssignment
 	 * @return
 	 */
-	public int[] PPSZmodify(CnfSatInstance CNF, int[] pi, int[] initialAssignment){
+	public int[] PPSZmodify(int[] initialAssignment){
 		int numVars = CNF.getNumVars();
+		int[] pi = permutatePi(numVars);
 		List<List<Integer>> currentClauses = CNF.getClauses();
 		List<Integer>[] occurrenceMap = CNF.getOccurrenceMap();
 		int[] assignments = new int[numVars];
 		int[] knownAssignments = CNF.getKnownAssignments();
 		
-		for (int i = 0; i < knownAssignments.length; i++)
+		for (int i = 0; i < knownAssignments.length; i++) //copying of array to prevent modification of knownAssignments array
 			assignments[i] = knownAssignments[i];
 		
 		for(int i : pi){
@@ -202,6 +225,35 @@ public class CNFsolver {
 		
 		return assignments;
 	}
-
 	
+	/**
+	 * Implements the Schoning random walk algorithm for solving 3-SAT.
+	 * Assumes that the initial assignment already takes into account the
+	 * known assignments.
+	 * Returns the satisfying assignment
+	 */
+	public int[] randomWalk(int[] initialAssignment){
+		for (int i = 0; i < initialAssignment.length; i ++){
+			if(CNF.getKnownAssignments()[i] != 0)
+				initialAssignment[i] = CNF.getKnownAssignments()[i];
+		}
+		
+		List<List<Integer>> clauses = CNF.getClauses();
+		int[] assignment = new int[initialAssignment.length] ;
+		for(int i = 0; i < initialAssignment.length; i++)
+			assignment[i] = initialAssignment[i];
+		
+		for(int i = 0; i <= 3 * CNF.getNumVars(); i++){
+			if(!verifyAssignment(assignment)){
+				System.out.println(clauses.get(unsatisfiedClause(assignment) - 1).size());
+				int posToFlip = new Random().nextInt(clauses.get(unsatisfiedClause(assignment) - 1).size());
+				int varToFlip = Math.abs(clauses.get(unsatisfiedClause(assignment) - 1).get(posToFlip));
+				if(CNF.getKnownAssignments()[varToFlip - 1] == 0)
+					assignment[varToFlip - 1] = -assignment[varToFlip - 1];
+			}
+			else
+				break;
+		}
+		return assignment;
+	}
 }

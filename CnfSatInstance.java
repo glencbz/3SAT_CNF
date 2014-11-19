@@ -32,10 +32,11 @@ public class CnfSatInstance
 		     * Public method that initialises the instance to make it able to run after parsing
 		     */
 		    public void initialise(){
+		    	//TODO: check for empty formula
 		    	knownAssignments = new int[numVars];
 		    	computeOccurrenceMap();
 		    	simplify();
-		    	computeOccurrenceMap();		    	
+		    	computeOccurrenceMap();
 		    }
 		    //generate lit -> clause map for lookup
 		    //caching this makes the computation of different views a lot faster
@@ -155,28 +156,34 @@ public class CnfSatInstance
 		    //TODO: improve the resolution function by binary searching a history of past clause comparisons
 		    
 		    public void createResolution(){
-		    	while(resolutionIteration())
+		    	double s = numVars / Math.log(numVars);
+		    	while(resolutionIteration(s))
 		    		computeOccurrenceMap();
 		    }
 		    
+		    public void oneRoundResolution(){
+		    	double s = numVars / Math.log(numVars);
+		    	if(resolutionIteration(s))
+		    		computeOccurrenceMap();
+		    }
 		    //TODO: compare the resolution algorithm with the original PPSZ to ensure fast run-time
-		    private boolean resolutionIteration(){
+		    private boolean resolutionIteration(double s){
 		    	boolean resFound = false;
 		    	for(int i = 1; i <= numVars; i++){
 		    		
 		    		if(!occurrenceMap[i - 1 + numVars].isEmpty()){
-		    			
 		    			for(int j : occurrenceMap[i - 1 + numVars]){
-		    				
 		    				for(int k : occurrenceMap[i - 1]){
-		    					
+		    				
 			    				int commonVar = (int) checkResolvence(clauses.get(k - 1), clauses.get(j-1));
 			    				if(commonVar != 0){
-			    					List<Integer> res = resolvent(clauses.get(k-1), clauses.get(j-1), commonVar);
-			    					if(clauses.lastIndexOf(res) == -1 && res.size() <= numVars){
-			    						clauses.add(res);
-			    						resFound = true;
-			    						numClauses++;
+			    					if(clauses.get(k-1).size() + clauses.get(j-1).size() - 2 < s){
+				    					List<Integer> res = resolvent(clauses.get(k-1), clauses.get(j-1), commonVar);
+				    					if(clauses.lastIndexOf(res) == -1 && res.size() < numVars){
+				    						clauses.add(res);
+				    						resFound = true;
+				    						numClauses++;
+			    					}
 			    					}
 			    				}
 		    				}
@@ -234,9 +241,9 @@ public class CnfSatInstance
 		    		unitClauseFound = false; //assume unit clause not found
 			    	for(List<Integer> l : clauses){
 			    		if(l.size() == 1){
-			    			knownAssignments[l.get(0) - 1] = l.get(0) < 0 ? -1: 1 ;
+			    			knownAssignments[l.get(0) > 0 ? l.get(0) - 1 : Math.abs(l.get(0)) - 1] = l.get(0) < 0 ? -1: 1 ;
 			    			this.clauses= givenVar(l.get(0));
-			    			this.numVars = clauses.size();
+			    			this.numClauses = clauses.size();
 			    			computeOccurrenceMap();
 			    			unitClauseFound = true;
 			    			break;
@@ -277,6 +284,14 @@ public class CnfSatInstance
 		    	while(eliminateUnitClauses() || eliminateTrivialities()){
 		    		
 		    	}
+		    }
+		    
+		    public boolean hasEmptyClauses(){
+		    	for(List<Integer> l : clauses){
+		    		if (l.isEmpty())
+		    			return true;
+		    	}
+		    	return false;
 		    }
 		    /**
 		     * Implements the brute force MICS generation and assignment guessing
