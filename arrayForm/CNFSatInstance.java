@@ -31,18 +31,20 @@ public class CNFSatInstance
 		    	this.clauses = clauses;
 		    	this.numClauses = numClauses;
 		    	this.numVars = numVars;
+		    	this.knownAssignments = new int[numVars];
 		    	deleted = new int[numClauses];
 		    	occurrenceNums = new int[numVars * 2];
 		    	occurrenceMap = computeOccurrenceMap(clauses, numVars, occurrenceNums);
 		    }
 		    
-		    public CNFSatInstance(int[][] clauses, int numVars, int[][] occurrenceMap, int[] occurrenceNums, int[] deleted){
+		    public CNFSatInstance(int[][] clauses, int numVars, int[][] occurrenceMap, int[] occurrenceNums, int[] deleted, int[] knownAssignments){
 		    	this.clauses = clauses;
 		    	this.numClauses = clauses.length;
 		    	this.numVars = numVars;
 		    	this.occurrenceMap = occurrenceMap;
 		    	this.occurrenceNums = occurrenceNums;
 		    	this.deleted = deleted;
+		    	this.knownAssignments = knownAssignments;
 		    }
 		    
  		    public int getNumClauses()
@@ -120,6 +122,9 @@ public class CNFSatInstance
 				int posPosition = var > 0? var - 1 : -var + numVars - 1;
 				int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
 		    	
+				int[] newKnownAssignments = copyArray(knownAssignments);
+				newKnownAssignments[Math.abs(var) - 1] = var > 0 ? 1 : -1; 
+				
 				int[][] newOccurrenceMap = copyOccurrenceMap(occurrenceMap);
 				newOccurrenceMap[posPosition] = new int[newOccurrenceMap[0].length];
 				newOccurrenceMap[negPosition] = new int[newOccurrenceMap[0].length];
@@ -153,7 +158,7 @@ public class CNFSatInstance
 		    	}
 		    	
 		    	
-		    	return new CNFSatInstance(newClauses, numVars, newOccurrenceMap, newOccurrenceNums, newDeleted);
+		    	return new CNFSatInstance(newClauses, numVars, newOccurrenceMap, newOccurrenceNums, newDeleted, newKnownAssignments);
 		    }
 
 			/**
