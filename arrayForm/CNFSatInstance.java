@@ -21,6 +21,8 @@ public class CNFSatInstance
 
 		    Stack<History> previousStates = null;
 		    
+		    int undoStackNum = 0;
+		    
 		    public boolean isChangeMade() {
 				return changeMade;
 			}
@@ -315,6 +317,7 @@ public class CNFSatInstance
 
 
 			public void simplify(){
+				int initialStackSize = previousStates.size();
 		    	boolean changesMade = true;
 		    	
 		    	while(changesMade){
@@ -324,16 +327,23 @@ public class CNFSatInstance
 		    		if(this.changeMade){ //equality can be checked this way because givenVar() and elimnateUnitClauses() only change addresses if changes are made
 		    			changesMade = true;
 		    		}
-		    		
+		    		eliminatePureLiterals();
 		    		if(this.changeMade){ //equality can be checked this way because givenVar() and elimnatePureLiterals() only change addresses if changes are made	
 		    			changesMade = true;
 		    		}
 //		    		System.out.println(changesMade);
 		    	}
+		    	
+		    	undoStackNum = previousStates.size() - initialStackSize;
 		    }
 
 
-
+			public void undoSimplify(){
+				while(undoStackNum > 0){
+					undoStackNum--;
+					undoChanges();
+				}
+			}
 			public int[][] copy2DArray(int[][] original){
 		    	int[][] copy = new int[original.length][original[0].length];
 		    	for(int i = 0; i < original.length; i++){
