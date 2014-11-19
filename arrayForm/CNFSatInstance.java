@@ -201,11 +201,14 @@ public class CNFSatInstance
 		    	CNFSatInstance eliminatedInstance = this;
 		    	while(unitClauseFound) { //always called on the first iteration
 		    		unitClauseFound = false; //assume unit clause not found
-		    		for(int[] clause : eliminatedInstance.getClauses()){
-		    			int var = getVarFromUnit(clause);
-		    			if(var != 0){
-		    				eliminatedInstance = eliminatedInstance.givenVarOccur(var);
-		    				unitClauseFound = true;
+		    		int[][] newClauses = eliminatedInstance.getClauses();
+		    		for(int i = 0; i < newClauses.length; i++){
+		    			if(eliminatedInstance.getDeleted()[i] != 1){
+			    			int var = getVarFromUnit(newClauses[i]);
+			    			if(var != 0){
+			    				eliminatedInstance = eliminatedInstance.givenVarOccur(var);
+			    				unitClauseFound = true;
+			    			}
 		    			}
 		    		}
 		    	}
