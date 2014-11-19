@@ -1,4 +1,4 @@
-package arrayForm;
+package ArrayFormDPLL;
 /*
  * Modified from the CnfSatInstance class from http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/data/cnf/CnfSatInstance.java?rev=1349
  */
@@ -20,7 +20,14 @@ public class CNFSatInstance
 		    protected int[][] clauses = null;
 		    protected int[][] occurrenceMap = null;
 		    protected List<Integer> clauseCache = null;
-		    
+
+
+			public int[][] getOccurrenceMap() {
+				return this.occurrenceMap;
+			}
+			private int[] newOccurenceMap = null;
+			private int[] numberOfOccurences = null;
+
 			public CNFSatInstance(){
 		    	setNumClauses(0);
 		    	setNumVars(0);
@@ -62,15 +69,25 @@ public class CNFSatInstance
 		    public int[] getKnownAssignments() {
 				return knownAssignments;
 			}
-		    
-		    /**
-		     * Returns an array where each element represents the 
-		     * presence of the literal in the clause
-		     * 
-		     * @param clauses
-		     * @param literal
-		     * @return
-		     */
+
+			public void addKnownAssignment(int literal) {
+
+				// lazy init of knownAssignments
+				if (this.knownAssignments == null) {
+					this.knownAssignments = new int[numVars];
+				}
+
+				this.knownAssignments[Math.abs(literal) - 1] = literal;
+			}
+
+			/**
+             * Returns an array where each element represents the
+             * presence of the literal in the clause
+             *
+             * @param clauses
+             * @param literal
+             * @return
+             */
 		    public int[] getOccurringClauses(int[][] clauses, int literal){
 		    	int[] occurringClauses = new int[clauses.length];
 		    	for (int i = 0; i < clauses.length; i++)
@@ -177,6 +194,15 @@ public class CNFSatInstance
 					}
 				}
 				return occurrenceNum;
+			}
+
+			public void addOccurence(int literal) {
+				return;
+			}
+
+
+			public int[] getOccurence(int literal) {
+				return;
 			}
 
 			public int sizeClause(int[] clause){

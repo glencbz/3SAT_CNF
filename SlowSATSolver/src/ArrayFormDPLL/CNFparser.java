@@ -4,7 +4,7 @@
  * 
  * 
  */
-package arrayForm;
+package ArrayFormDPLL;
 
 import java.io.File;
 import java.io.FileNotFoundException;
