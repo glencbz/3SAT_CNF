@@ -1,9 +1,4 @@
-/*
- * Modified from the CNF parser found on
- * http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/io/cnf/DimacsCnfParser.java?rev=1349
- * 
- * 
- */
+
 package arrayForm;
 
 import java.io.File;
