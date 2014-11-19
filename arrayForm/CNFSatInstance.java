@@ -1,14 +1,10 @@
 package arrayForm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-	
+import java.util.Map;	
 
 public class CNFSatInstance
 	{
@@ -20,13 +16,21 @@ public class CNFSatInstance
 		    protected int[][] occurrenceMap = null;
 		    private int[] occurrenceNums = null;
 		    private int[] deleted = null; 
+		    private boolean changeMade = false;
 		    
-		    History previousState = null;
+		    public boolean isChangeMade() {
+				return changeMade;
+			}
+
+			public void setChangeMade(boolean changeMade) {
+				this.changeMade = changeMade;
+			}
+			History previousState = null;
 		    
 			public CNFSatInstance(int numClauses, int numVars,
 					int[] knownAssignments, int[][] clauses,
 					int[][] occurrenceMap, int[] occurrenceNums, int[] deleted,
-					History previousState) {
+					History previousState, boolean changeMade) {
 				super();
 				this.numClauses = numClauses;
 				this.numVars = numVars;
@@ -36,6 +40,7 @@ public class CNFSatInstance
 				this.occurrenceNums = occurrenceNums;
 				this.deleted = deleted;
 				this.previousState = previousState;
+				this.changeMade = changeMade;
 			}
 
 			public CNFSatInstance(){
@@ -138,7 +143,7 @@ public class CNFSatInstance
 			public CNFSatInstance givenVarMutator(int var){
 				int posPosition = var > 0? var - 1 : -var + numVars - 1;
 				if (occurrenceNums[posPosition] == 0){
-					this.previousState.setChangeMade(false);
+					this.setChangeMade(false);
 					return this;
 				}
 				int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
@@ -192,7 +197,7 @@ public class CNFSatInstance
 						this.occurrenceMap, this.occurrenceNums, this.deleted, new History(
 						knownAssignmentsChanges, lastGivenVar,
 						clausesChanges, occurrenceMapChanges,
-						occurrenceNumsChanges, deletedChanges, true));
+						occurrenceNumsChanges, deletedChanges), true);
 		    }
 
 			public void undoChanges(){
@@ -269,7 +274,7 @@ public class CNFSatInstance
 		     */
 		    public CNFSatInstance eliminateUnitClauses(){
 		    	CNFSatInstance eliminatedInstance = this;
-		    	eliminatedInstance.previousState.setChangeMade(false);
+		    	eliminatedInstance.setChangeMade(false);
 	    		int[][] newClauses = eliminatedInstance.getClauses();
 	    		for(int i = 0; i < newClauses.length; i++){
 	    			if(eliminatedInstance.getDeleted()[i] != 1){
@@ -292,7 +297,7 @@ public class CNFSatInstance
 		     */
 		    public CNFSatInstance eliminatePureLiterals(){
 		    	CNFSatInstance eliminatedInstance = this;
-		    	eliminatedInstance.previousState.setChangeMade(false);
+		    	eliminatedInstance.setChangeMade(false);
 		    	for(int i = 0; i < numVars; i++){
 		    		if(occurrenceNums[i] == 0 && occurrenceNums[i + numVars]!= 0){ //if the literal i does not appear
 		    			eliminatedInstance = eliminatedInstance.givenVarMutator(- (i + 1));
@@ -318,13 +323,13 @@ public class CNFSatInstance
 		    		changesMade = false;
 		    		CNFSatInstance eliminateUnits = simplifiedInstance.eliminateUnitClauses();
 		    		
-		    		if(eliminateUnits.previousState.isChangeMade()){ //equality can be checked this way because givenVar() and elimnateUnitClauses() only change addresses if changes are made
+		    		if(eliminateUnits.isChangeMade()){ //equality can be checked this way because givenVar() and elimnateUnitClauses() only change addresses if changes are made
 		    			simplifiedInstance = eliminateUnits;
 		    			changesMade = true;
 		    		}
 		    		
 		    		CNFSatInstance eliminatePures = simplifiedInstance.eliminatePureLiterals();
-		    		if(eliminatePures.previousState.isChangeMade()){ //equality can be checked this way because givenVar() and elimnatePureLiterals() only change addresses if changes are made
+		    		if(eliminatePures.isChangeMade()){ //equality can be checked this way because givenVar() and elimnatePureLiterals() only change addresses if changes are made
 		    			simplifiedInstance = eliminatePures;	
 		    			changesMade = true;
 		    		}
@@ -733,12 +738,12 @@ class History{
     Map<Integer, int[]> occurrenceMapChanges = null;
     Map<Integer, Integer> occurrenceNumsChanges = null;
     List<Integer> deletedChanges = null;
-    boolean changeMade = false;
+    
 	public History(int knownAssignmentsChanges, int lastGivenVar,
 			Map<Integer, int[]> clausesChanges,
 			Map<Integer, int[]> occurrenceMapChanges,
 			Map<Integer, Integer> occurrenceNumsChanges,
-			List<Integer> deletedChanges, boolean changeMade) {
+			List<Integer> deletedChanges) {
 		super();
 		this.knownAssignmentsChanges = knownAssignmentsChanges;
 		this.lastGivenVar = lastGivenVar;
@@ -746,7 +751,6 @@ class History{
 		this.occurrenceMapChanges = occurrenceMapChanges;
 		this.occurrenceNumsChanges = occurrenceNumsChanges;
 		this.deletedChanges = deletedChanges;
-		this.changeMade = changeMade;
 	}
 	public int getKnownAssignmentsChanges() {
 		return knownAssignmentsChanges;
@@ -784,12 +788,7 @@ class History{
 	public void setDeletedChanges(List<Integer> deletedChanges) {
 		this.deletedChanges = deletedChanges;
 	}
-	public boolean isChangeMade() {
-		return changeMade;
-	}
-	public void setChangeMade(boolean changeMade) {
-		this.changeMade = changeMade;
-	}
+
     
     
 }

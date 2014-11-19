@@ -24,13 +24,13 @@ public class Tester {
 		System.out.println("....");
 		
 		
-//		long started = System.nanoTime();
-//		CNFSatInstance simplified = test.simplify();
-//		
-//		long time = System.nanoTime();
-//		long timeTaken = time - started;
-//		System.out.println("Time:" + timeTaken/1000000.0 + "ms");
-//		System.out.println(simplified);
-//		System.out.println("...");
+		long started = System.nanoTime();
+		CNFSatInstance simplified = test.simplify();
+		
+		long time = System.nanoTime();
+	long timeTaken = time - started;
+	System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+	System.out.println(simplified);
+	System.out.println("...");
 	}
 }
