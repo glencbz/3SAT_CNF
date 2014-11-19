@@ -2,7 +2,6 @@ package sat;
 
 import immutable.EmptyImList;
 import immutable.ImList;
-import javafx.geometry.Pos;
 import sat.env.Bool;
 import sat.env.Environment;
 import sat.env.Variable;
@@ -20,7 +19,7 @@ public class SATSolver {
      * unit propagation. The returned environment binds literals of class
      * bool.Variable rather than the special literals used in clausification of
      * class clausal.Literal, so that clients can more readily use it.
-     * 
+     *
      * @return an environment for which the problem evaluates to Bool.TRUE, or
      *         null if no such environment exists.
      */
@@ -71,7 +70,7 @@ public class SATSolver {
             System.out.println("CANNOT SOLVE");
         } else {
             System.out.println("SOLVED");
-            System.out.println(result);
+//            System.out.println(result);
         }
 
         return result;
@@ -93,6 +92,7 @@ public class SATSolver {
         }
 
         Clause currentSmallestClause = null;
+        int currentSmallestClauseSize = 0;
         // Check for empty clause
         Iterator<Clause> clauseItr = formula.iterator();
 
@@ -111,10 +111,13 @@ public class SATSolver {
             // Initialise currentSmallestClause for first iteration
             if (currentSmallestClause == null) {
                 currentSmallestClause = aClause;
+                currentSmallestClauseSize = aClause.size();
             }
 
-            if (aClause.size() > currentSmallestClause.size()) {
+            if (aClause.size() > currentSmallestClauseSize) {
                 currentSmallestClause = aClause;
+                currentSmallestClauseSize = aClause.size();
+
             }
         }
 
@@ -124,15 +127,14 @@ public class SATSolver {
         // we now check if the clause has only one literal
 
 
-        if (currentSmallestClause.size() == 1) {
+        if (currentSmallestClauseSize == 1) {
             Literal currentLiteral = currentSmallestClause.chooseLiteral();
             Variable currentVariable = currentLiteral.getVariable();
 
-            // TODO better way to Check if literal is negative
-            if (currentLiteral.toString().contains("~")) {
+//            // TODO better way to Check if literal is negative
+            if (currentLiteral instanceof NegLiteral) {
                 testEnvironment = testEnvironment.putFalse(currentVariable);
             } else {
-
                 testEnvironment = testEnvironment.putTrue(currentVariable);
             }
 
@@ -153,25 +155,28 @@ public class SATSolver {
          */
         {
             Literal chosenLiteral = currentSmallestClause.chooseLiteral();
-            Variable currentVariable = chosenLiteral.getVariable();
             ImList<Clause> currentClauses = formula.getClauses();
+
+            Variable currentVariable = chosenLiteral.getVariable();
+            ImList<Clause> positiveNewClauses = substitute(currentClauses, chosenLiteral);
+            Formula positiveTestFormula = newFormulaFromClauses(positiveNewClauses, formula);
+
+
+            Environment result = recursSolve(positiveTestFormula);
 
             Bool literalSign;
             // Check sign of literal and assigns it to boolean
-            if (chosenLiteral.toString().contains("~")) {
+            if (chosenLiteral instanceof NegLiteral) {
                 literalSign = Bool.FALSE;
             } else {
                 literalSign = Bool.TRUE;
             }
 
-
             // First test for positive Literal
 
             // First test the literal as it is, and if the result if null, test the negated case
 
-            ImList<Clause> positiveNewClauses = substitute(currentClauses, chosenLiteral);
-            Formula positiveTestFormula = newFormulaFromClauses(positiveNewClauses, formula);
-            Environment result = recursSolve(positiveTestFormula);
+
 
             // If the result succeeds, return the tested environment
             if (result != null) {
@@ -224,7 +229,7 @@ public class SATSolver {
     /**
      * Takes a partial assignment of variables to values, and recursively
      * searches for a complete satisfying assignment.
-     * 
+     *
      * @param clauses
      *            formula in conjunctive normal form
      * @param env
@@ -241,7 +246,7 @@ public class SATSolver {
     /**
      * given a clause list and literal, produce a new list resulting from
      * setting that literal to true
-     * 
+     *
      * @param clauses
      *            , a list of clauses
      * @param l
@@ -251,8 +256,11 @@ public class SATSolver {
     private static ImList<Clause> substitute(ImList<Clause> clauses,
             Literal l) {
         // TODO: implement this.
+
         ImList<Clause> substitutedClauses = new EmptyImList<Clause>();
+
         Iterator<Clause> imItr = clauses.iterator();
+
         while (imItr.hasNext()) {
             Clause aClause = imItr.next();
             Clause reducedClause = aClause.reduce(l);

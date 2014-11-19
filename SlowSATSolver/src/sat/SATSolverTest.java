@@ -19,12 +19,12 @@ public class SATSolverTest {
     Literal nc = c.getNegation();
 
 
-
+    // Isunit
     
     // TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
     public static void main(String[] args) {
-//        SATSolverTest tester = new SATSolverTest();
-//        tester.testSATSolver1();
+        SATSolverTest tester = new SATSolverTest();
+        tester.testSATSolver1();
 //        tester.testSATSolver2();
 
 
@@ -37,10 +37,10 @@ public class SATSolverTest {
         long parseStarted = System.nanoTime();
 
 
-        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/largeSat.cnf");
+//        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/largeSat.cnf");
 //        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/largeUnsat.cnf");
 //        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/s8Sat.cnf");
-
+        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/aim-50-1_6-yes1-4.cnf");
         long parseTime = System.nanoTime();
         long parseTimeTaken = parseTime - parseStarted;
 
