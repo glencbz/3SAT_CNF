@@ -75,6 +75,7 @@ public class CNFparser
 	                            clauses[clauseCount][currentClauseCount] = literal;
 	                            currentClauseCount++;
 	                        	}catch(ArrayIndexOutOfBoundsException e){
+	                        		System.out.println(e);
 	                        		System.out.println("Number of literals did not match 3 SAT.");
 	                        		in.close();
 	                        		return null;
