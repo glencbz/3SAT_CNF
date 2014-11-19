@@ -1,7 +1,11 @@
+<<<<<<< HEAD:SlowSATSolver/src/ArrayFormDPLL/CNFSatInstance.java
 package ArrayFormDPLL;
 /*
  * Modified from the CnfSatInstance class from http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/data/cnf/CnfSatInstance.java?rev=1349
  */
+=======
+package arrayForm;
+>>>>>>> f28460bb28120ef80f7a5262b7ceba015df4e718:arrayForm/CNFSatInstance.java
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +23,7 @@ public class CNFSatInstance
 		    
 		    protected int[][] clauses = null;
 		    protected int[][] occurrenceMap = null;
+<<<<<<< HEAD:SlowSATSolver/src/ArrayFormDPLL/CNFSatInstance.java
 		    protected List<Integer> clauseCache = null;
 
 
@@ -28,6 +33,12 @@ public class CNFSatInstance
 			private int[] newOccurenceMap = null;
 			private int[] numberOfOccurences = null;
 
+=======
+		    
+		    private int[] occurrenceNums = null;
+		    private int[] deleted = null; 
+		    
+>>>>>>> f28460bb28120ef80f7a5262b7ceba015df4e718:arrayForm/CNFSatInstance.java
 			public CNFSatInstance(){
 		    	setNumClauses(0);
 		    	setNumVars(0);
@@ -39,9 +50,23 @@ public class CNFSatInstance
 		    	this.clauses = clauses;
 		    	this.numClauses = numClauses;
 		    	this.numVars = numVars;
+		    	this.knownAssignments = new int[numVars];
+		    	deleted = new int[numClauses];
+		    	occurrenceNums = new int[numVars * 2];
+		    	occurrenceMap = computeOccurrenceMap(clauses, numVars, occurrenceNums);
 		    }
 		    
-		    public int getNumClauses()
+		    public CNFSatInstance(int[][] clauses, int numVars, int[][] occurrenceMap, int[] occurrenceNums, int[] deleted, int[] knownAssignments){
+		    	this.clauses = clauses;
+		    	this.numClauses = clauses.length;
+		    	this.numVars = numVars;
+		    	this.occurrenceMap = occurrenceMap;
+		    	this.occurrenceNums = occurrenceNums;
+		    	this.deleted = deleted;
+		    	this.knownAssignments = knownAssignments;
+		    }
+		    
+ 		    public int getNumClauses()
 		    {
 		    	return numClauses;
 		    }
@@ -70,6 +95,7 @@ public class CNFSatInstance
 				return knownAssignments;
 			}
 
+<<<<<<< HEAD:SlowSATSolver/src/ArrayFormDPLL/CNFSatInstance.java
 			public void addKnownAssignment(int literal) {
 
 				// lazy init of knownAssignments
@@ -102,89 +128,32 @@ public class CNFSatInstance
 		    	return occurringClauses;
 		    }
 		    
+=======
+>>>>>>> f28460bb28120ef80f7a5262b7ceba015df4e718:arrayForm/CNFSatInstance.java
 		    /**
-		     * Returns a set of clauses containing the literal
+		     * Also takes in an array occurrenceNumMap
 		     * @param clauses
-		     * @param literal
+		     * @param numVars
+		     * @param occurrenceNumMap
 		     * @return
 		     */
-		    public Set<Set<Integer>> getOccurringClauses(Set<Set<Integer>>clauses, int literal){
-		    	Set<Set<Integer>> occurringClauses = new HashSet<Set<Integer>>();
-		    	for (Set<Integer> clause: clauses){
-		    		if(clause.contains(literal))
-		    			occurringClauses.add(clause);
-		    	}
-		    	return occurringClauses;
-		    }		    
-		    
-		    public int getNumOccurringClauses(int[][] clauses, int literal){
-		    	int ret = 0;
-		    	for(int occurrence : getOccurringClauses(clauses, literal)){
-		    		ret += occurrence;
-		    	}
-		    	return ret;
-		    }
-		    
-		    public int getNumOccurringClauses(int[] occurringClauses, int literal){
-		    	int ret = 0;
-		    	for(int occurrence : occurringClauses){
-		    		ret += occurrence;
-		    	}
-		    	return ret;
-		    }
-		    
-		    public int[] getOccurringClauses(List<List<Integer>> clauses, int literal){
-		    	int[] occurringClauses = new int[clauses.size()];
-		    	for (int i = 0; i < clauses.size(); i++)
-		    	{
-		    		for (int lit : clauses.get(i))
-		    		{
-		    			if(lit == literal){
-		    				occurringClauses[i] = 1;
+		    public int[][] computeOccurrenceMap(int[][] clauses, int numVars, int[] occurrenceNumMap){
+			    //  entries [0,...,numVars-1] for positive literals
+			    //  entries [numVars,...,2*numVars-1] for negative literals
+		    	int[][] occurMap = new int[numVars * 2][clauses.length];
+		    	for (int i = 0; i < clauses.length; i++){
+		    		for (int literal : clauses[i]){
+		    			if(literal != 0){
+			    			int pos = literal > 0 ? literal - 1: numVars + Math.abs(literal) - 1;
+			    			occurMap[pos][occurrenceNumMap[pos]] = i + 1;
+			    			occurrenceNumMap[pos]++;
 		    			}
 		    		}
 		    	}
-		    	return occurringClauses;
+		    	return occurMap;
 		    }
 		    
-		    public int getNumOccurringClauses(List<List<Integer>> clauses, int literal){
-		    	int ret = 0;
-		    	for(int occurrence : getOccurringClauses(clauses, literal)){
-		    		ret += occurrence;
-		    	}
-		    	return ret;
-		    }		    		    
-		    
-		    public Set<Set<Integer>> computeSetCache(int[][]clauses){
-		    	Set<Set<Integer>> setCache = new HashSet<Set<Integer>>();
-		    	for(int[] clause: clauses){
-		    		Set<Integer> newClause = new HashSet<Integer>();
-		    		for(int lit : clause){
-		    			if (lit != 0)
-		    				newClause.add(lit);
-		    		}
-		    		setCache.add(newClause);
-		    	}
-		    	return setCache;
-		    }
-		    
-		    public int[][] computeOccurrenceMap(int[][] clauses, int numVars)
-		    {
-			    //  entries [0,...,numVars-1] for positive literals
-			    //  entries [numVars,...,2*numVars-1] for negative literals
-				
-		    	occurrenceMap = new int[clauses.length][numVars * 2];
-		    	for (int i = 0; i < clauses.length; i++)
-		    	{
-		    		for (int literal : clauses[i])
-		    		{
-		    			int pos = literal > 0 ? literal: numVars + Math.abs(literal);
-		    			occurrenceMap[i][pos - 1] = 1;
-		    		}
-		    	}
-		    	return occurrenceMap;
-		    }
-		    
+<<<<<<< HEAD:SlowSATSolver/src/ArrayFormDPLL/CNFSatInstance.java
 			public int[] occurrenceNum(int[][] occurrenceMap){
 				int[] occurrenceNum = new int[occurrenceMap[0].length];
 				for(int clause = 0; clause < occurrenceMap.length; clause++){
@@ -205,6 +174,8 @@ public class CNFSatInstance
 				return;
 			}
 
+=======
+>>>>>>> f28460bb28120ef80f7a5262b7ceba015df4e718:arrayForm/CNFSatInstance.java
 			public int sizeClause(int[] clause){
 				int ret = 0;
 				for(int i : clause)
@@ -212,18 +183,61 @@ public class CNFSatInstance
 				return ret;
 			}
 			
-			public int getVarFromUnit(int[] clause){
-				if (sizeClause(clause) != 1)
-					return 0;
-				else{
-					for(int i : clause){
-						if(i != 0)
-							return i;
-					}
-				}
-				return 0;
+			public int[][] getOccurrenceMap() {
+				return occurrenceMap;
 			}
-			
+
+			public int[] getOccurrenceNums() {
+				return occurrenceNums;
+			}
+
+			public int[] getDeleted() {
+				return deleted;
+			}
+
+			public CNFSatInstance givenVarOccur(int[][] clauses, int var){
+				int posPosition = var > 0? var - 1 : -var + numVars - 1;
+				int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
+		    	
+				int[] newKnownAssignments = copyArray(knownAssignments);
+				newKnownAssignments[Math.abs(var) - 1] = var > 0 ? 1 : -1; 
+				
+				int[][] newOccurrenceMap = copyOccurrenceMap(occurrenceMap);
+				newOccurrenceMap[posPosition] = new int[newOccurrenceMap[0].length];
+				newOccurrenceMap[negPosition] = new int[newOccurrenceMap[0].length];
+				
+				int[] newOccurrenceNums = copyArray(occurrenceNums);
+				newOccurrenceNums[posPosition] = 0;
+				newOccurrenceNums[negPosition] = 0;
+				
+				int[] posOccurrences = occurrenceMap[posPosition];
+				
+				int[] newDeleted = copyArray(deleted);
+		    	for(int clause: posOccurrences){
+		    		System.out.println("." +clause);
+		    		if (clause == 0)
+		    			break;
+		    		newDeleted[clause-1] = 1;
+		    	}
+		    		
+		    	
+		    	int[] negOccurrences = occurrenceMap[negPosition];
+		    	
+		    	int[][] newClauses = copy2DArray(clauses);
+		    	
+		    	for(int clause : negOccurrences){
+		    		if (clause == 0)
+		    			break;
+		    		for(int i = 0; i < 3; i++){
+		    			if(newClauses[clause - 1][i] == -var)
+		    				newClauses[clause - 1][i] = 0;
+		    		}
+		    	}
+		    	
+		    	
+		    	return new CNFSatInstance(newClauses, numVars, newOccurrenceMap, newOccurrenceNums, newDeleted, newKnownAssignments);
+		    }
+
 			/**
 			 * Returns a given formula assuming the assignment denoted by var
 			 * 
@@ -257,44 +271,6 @@ public class CNFSatInstance
 		    	return newClauses;
 		    }
 
-			/**
-			 * Takes in a formula cached in a set of sets. MUTATES THE ORIGINAL FORMULA
-			 * according to substitution of the given variable.
-			 * @param clauses
-			 * @param var
-			 * @return
-			 */
-			public Set<Set<Integer>> givenVar(Set<Set<Integer>> clauses, int var){
-		    	
-				//remove instances of the negative of the literal
-				for(Set<Integer> clause: clauses){
-		    		Set<Integer> litToRemove = new HashSet<Integer>();
-		    		for(int lit : clause){
-		    			if (lit == -var)
-		    				litToRemove.add(lit);
-		    		}
-		    		for(int removeLit : litToRemove){
-		    			clause.remove(removeLit);
-		    		}
-		    	}
-				
-				//remove clauses containing the literal
-				Set<Set<Integer>> clausesToRemove = new HashSet<Set<Integer>>();
-				for(Set<Integer> clause: clauses){
-					if(clause.contains(var)){
-						clausesToRemove.add(clause);
-					}
-				}
-				
-				for(Set<Integer> clauseToRemove: clausesToRemove){
-					clauses.remove(clauseToRemove);
-				}
-				
-				return clauses;
-		    }
-
-
-
 		    /**
 		     * Removes unit clauses from the formula
 		     */
@@ -313,59 +289,7 @@ public class CNFSatInstance
 		    	}
 		    	return newFormula;
 		    }
-		   
-		    /**
-		     * Operates on a cached set representation of clauses
-		     * @param clauses
-		     * @return
-		     */
-		    public boolean eliminateUnitClauses(Set<Set<Integer>> clauses){
-		    	boolean unitClauseFound = true;
-		    	boolean changesMade = false;
-		    	
-		    	Set<Integer> variablesToRemove = new HashSet<Integer>();
-		    	while(unitClauseFound) { //always called on the first iteration
-		    		unitClauseFound = false; //assume unit clause not found
-		    		for(Set<Integer> clause: clauses){
-		    			if(clause.size() == 1){
-		    				variablesToRemove.add(clause.iterator().next());
-		    			}
-		    		}
-		    	}
-		    	if(variablesToRemove.size() > 0){
-    				changesMade = true;
-    				for(int var : variablesToRemove){
-    					givenVar(clauses, var);
-    				}
-		    	}
-		    	return changesMade;
-		    }
-		    /**
-		     * Operates on a cached set representation of clauses.
-		     * Returns true if a change is made
-		     * @param clauses
-		     * @return
-		     */
-		    public boolean eliminatePureLiterals(Set<Set<Integer>> clauseSet){
-		    	boolean changesMade = false;
-		    	for(int i = 1; i <= numVars; i++){
-		    		System.out.println("foo " + i);
-		    		int numPosOccurr = getOccurringClauses(clauseSet, i).size();
-		    		int numNegOccurr = getOccurringClauses(clauseSet, -i).size();
-		    		if(numPosOccurr == 0 && numNegOccurr != 0){ //if the literal i does not appear
-		    			givenVar(clauseSet, -i);
-		    			changesMade = true;
-		    		}
-		    		else if(numPosOccurr != 0 && numNegOccurr == 0){
-		    			givenVar(clauseSet, i);
-		    			changesMade = true;
-		    		}
-		    	}
-		    	
-		    	return changesMade;
-		    }
 
-		    
 		    /**
 		     * Dependent on numVars
 		     * @param clauses
@@ -424,20 +348,274 @@ public class CNFSatInstance
 		    	}
 		    	return newFormula;
 		    }
-	
+
+		    public int[][] copy2DArray(int[][] original){
+		    	int[][] copy = new int[original.length][original[0].length];
+		    	for(int i = 0; i < original.length; i++){
+		    		for(int j = 0; j < original[0].length; j++){
+		    			copy[i][j] = original[i][j];
+		    		}
+		    	}
+		    	return copy;
+		    }
+		    public int[][] copyOccurrenceMap(int[][] original){
+		    	int[][] copy = new int[original.length][original[0].length];
+		    	for(int i = 0; i < original.length; i++){
+		    		for(int j = 0; j < original[0].length; j++){
+		    			if(original[i][j] == 0)
+		    				break;
+		    			copy[i][j] = original[i][j];
+		    		}
+		    	}
+		    	return copy;
+		    }
+		    
+		    public int[] copyArray(int[] original){
+		    	int[] copy = new int[original.length];
+		    	for(int i = 0; i < original.length; i++)
+		    		copy[i] = original[i];
+		    	return copy;
+		    }
+		    		
+		    @Deprecated
+		    /**
+		     * Depreciated
+		     * @param occurrenceMap
+		     * @return
+		     */
+			public int[] occurrenceNum(int[][] occurrenceMap){
+				int[] occurrenceNum = new int[occurrenceMap[0].length];
+				for(int clause = 0; clause < occurrenceMap.length; clause++){
+					for(int var = 0; var < occurrenceMap[0].length; var++){
+						if(occurrenceMap[clause][var] != 0)
+							occurrenceNum[var]++;
+					}
+				}
+				return occurrenceNum;
+			}
+		    @Deprecated
+			/**
+			 * Depreciated
+			 * @param clause
+			 * @return
+			 */
+			public int getVarFromUnit(int[] clause){
+				if (sizeClause(clause) != 1)
+					return 0;
+				else{
+					for(int i : clause){
+						if(i != 0)
+							return i;
+					}
+				}
+				return 0;
+			}
+		    @Deprecated
+		    /**
+		     * DEPRECIATED
+		     * Returns an array where each element represents the 
+		     * presence of the literal in the clause
+		     * 
+		     * @param clauses
+		     * @param literal
+		     * @return
+		     */
+		    public int[] getOccurringClauses(int[][] clauses, int literal){
+		    	int[] occurringClauses = new int[clauses.length];
+		    	for (int i = 0; i < clauses.length; i++)
+		    	{
+		    		for (int lit : clauses[i])
+		    		{
+		    			if(lit == literal){
+		    				occurringClauses[i] = 1;
+		    			}
+		    		}
+		    	}
+		    	return occurringClauses;
+		    }
+		    @Deprecated
+		    /**
+		     * Depreciated
+		     * @param clauses
+		     * @param literal
+		     * @return
+		     */
+		    public int getNumOccurringClauses(int[][] clauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : getOccurringClauses(clauses, literal)){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    @Deprecated
+		    /**
+		     * Depreciated
+		     * @param occurringClauses
+		     * @param literal
+		     * @return
+		     */
+		    public int getNumOccurringClauses(int[] occurringClauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : occurringClauses){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    /**
+		     * Returns a set of clauses containing the literal
+		     * @param clauses
+		     * @param literal
+		     * @return
+		     *//*
+		    public Set<Set<Integer>> getOccurringClauses(Set<Set<Integer>>clauses, int literal){
+		    	Set<Set<Integer>> occurringClauses = new HashSet<Set<Integer>>();
+		    	for (Set<Integer> clause: clauses){
+		    		if(clause.contains(literal))
+		    			occurringClauses.add(clause);
+		    	}
+		    	return occurringClauses;
+		    }		    */
+		    /*		    
+		    public int getNumOccurringClauses(Set<int[]> clauses, int var){
+		    	int numOccur = 0;
+		    	for(int[] clause : clauses){
+		    		for(int lit : clause){
+		    			if (lit == var){
+		    				numOccur++;
+		    				break;
+		    			}
+		    		}
+		    	}
+		    	return numOccur;
+		    }*/
+		    
+/*		    public int[] getOccurringClauses(List<List<Integer>> clauses, int literal){
+		    	int[] occurringClauses = new int[clauses.size()];
+		    	for (int i = 0; i < clauses.size(); i++)
+		    	{
+		    		for (int lit : clauses.get(i))
+		    		{
+		    			if(lit == literal){
+		    				occurringClauses[i] = 1;
+		    			}
+		    		}
+		    	}
+		    	return occurringClauses;
+		    }
+		    
+		    public int getNumOccurringClauses(List<List<Integer>> clauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : getOccurringClauses(clauses, literal)){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }		*/
+		    
+		    /*public Set<int[]> computeSetCache(int[][]clauses){
+		    	Set<int[]> setCache = new HashSet<int[]>();
+		    	for(int[] clause: clauses){
+		    		int[] newClause = new int[3];
+		    		for(int i = 0; i < 3; i++){
+		    			newClause[i] = clause[i];
+		    		}
+		    		setCache.add(newClause);
+		    	}
+		    	return setCache;
+		    }*/
+		    /*			*//**
+			 * Takes in a formula cached in a set of int arrays. MUTATES THE ORIGINAL FORMULA
+			 * according to substitution of the given variable.
+			 * @param clauses
+			 * @param var
+			 * @return
+			 *//*
+			public Set<int[]> givenVar(Set<int[]> clauses, int var){
+		    	
+				//remove instances of the negative of the literal
+				for(int[] clause: clauses){
+		    		for(int i = 0; i < 3; i++){
+		    			clause[i] = clause[i] == -var ? 0 : clause[i];
+		    		}
+		    	}
+				
+				//remove clauses containing the literal
+				List<int[]> clausesToRemove = new ArrayList<int[]>();
+				for(int[] clause: clauses){
+					for(int i = 0; i < 3; i++){
+						if(clause[i] == var){
+							clausesToRemove.add(clause);
+							break;
+						}
+					}
+				}
+				
+				for(int[] clauseToRemove: clausesToRemove){
+					clauses.remove(clauseToRemove);
+				}
+				
+				return clauses;
+		    }
+*/
+		    
+		    
 		    /**
 		     * Takes in a cachedClause list and modifies it directly for faster processing
 		     * 
 		     * @param cachedClause
 		     * @return
 		     */
-		    public Set<Set<Integer>> cachedSimplify(int[][] clauses){
-		    	Set<Set<Integer>> cache = computeSetCache(clauses);
+/*		    public Set<int[]> cachedSimplify(int[][] clauses){
+		    	Set<int[]> cache = computeSetCache(clauses);
 		    	while(eliminatePureLiterals(cache) || eliminateUnitClauses(cache)){
 		    	}
 		    	return cache;
 		    }
 		    
+		    public boolean eliminateUnitClauses(Set<int[]> clauses){
+		    	boolean unitClauseFound = true;
+		    	boolean changesMade = false;
+		    	
+		    	List<Integer> variablesToRemove = new ArrayList<Integer>();
+		    	while(unitClauseFound) { //always called on the first iteration
+		    		unitClauseFound = false; //assume unit clause not found
+		    		for(int[] clause: clauses){
+		    			int varToRemove = getVarFromUnit(clause);
+		    			if(varToRemove != 0)
+		    				variablesToRemove.add(varToRemove);
+		    		}
+		    	}
+		    	
+		    	if(variablesToRemove.size() > 0){
+    				changesMade = true;
+    				for(int var : variablesToRemove){
+    					givenVar(clauses, var);
+    				}
+		    	}
+		    	return changesMade;
+		    }
+		    *//**
+		     * Operates on a cached set representation of clauses.
+		     * Returns true if a change is made
+		     * @param clauses
+		     * @return
+		     *//*
+		    public boolean eliminatePureLiterals(Set<int[]> clauseSet){
+		    	boolean changesMade = false;
+		    	for(int i = 1; i <= numVars; i++){
+		    		int numPosOccurr = getNumOccurringClauses(clauseSet, i);
+		    		int numNegOccurr = getNumOccurringClauses(clauseSet, -i);
+		    		if(numPosOccurr == 0 && numNegOccurr != 0){ //if the literal i does not appear
+		    			givenVar(clauseSet, -i);
+		    			changesMade = true;
+		    		}
+		    		else if(numPosOccurr != 0 && numNegOccurr == 0){
+		    			givenVar(clauseSet, i);
+		    			changesMade = true;
+		    		}
+		    	}
+		    	
+		    	return changesMade;
+		    }*/
 		    /*			
 			public void initialise(){
 		    	//TODO: check for empty formula

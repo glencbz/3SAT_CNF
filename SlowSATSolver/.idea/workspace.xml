@@ -149,8 +149,8 @@
           <file leaf-file-name="CNFSatInstance.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/CNFSatInstance.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.33887044" vertical-offset="646" max-vertical-offset="8891">
-                  <caret line="72" column="12" selection-start-line="72" selection-start-column="12" selection-end-line="80" selection-end-column="13" />
+                <state vertical-scroll-proportion="0.056478404" vertical-offset="646" max-vertical-offset="8891">
+                  <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="8" />
                   <folding>
                     <element signature="e#646#647#0" expanded="true" />
                     <element signature="e#682#683#0" expanded="true" />
@@ -1320,8 +1320,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/CNFSatInstance.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33887044" vertical-offset="646" max-vertical-offset="8891">
-          <caret line="72" column="12" selection-start-line="72" selection-start-column="12" selection-end-line="80" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.056478404" vertical-offset="646" max-vertical-offset="8891">
+          <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="8" />
           <folding>
             <element signature="e#646#647#0" expanded="true" />
             <element signature="e#682#683#0" expanded="true" />

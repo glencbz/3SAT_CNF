@@ -1,3 +1,4 @@
+<<<<<<< HEAD:SlowSATSolver/src/ArrayFormDPLL/CNFparser.java
 /*
  * Modified from the CNF parser found on
  * http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/io/cnf/DimacsCnfParser.java?rev=1349
@@ -5,6 +6,10 @@
  * 
  */
 package ArrayFormDPLL;
+=======
+
+package arrayForm;
+>>>>>>> f28460bb28120ef80f7a5262b7ceba015df4e718:arrayForm/CNFparser.java
 
 import java.io.File;
 import java.io.FileNotFoundException;
