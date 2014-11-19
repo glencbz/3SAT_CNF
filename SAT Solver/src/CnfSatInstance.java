@@ -2,23 +2,23 @@
  * Modified from the CnfSatInstance class from http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/data/cnf/CnfSatInstance.java?rev=1349
  */
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 	
 
 public class CnfSatInstance
-	{
+	{		
+			
 			private int numClauses;
 		    private int numVars;
-		    
+		    private int[] knownAssignments = null;
 		    //TODO: possible time improvement, replace List implementation with Array implementation
+		    protected int[][] originalClauses;
+		    protected int[][] clauses = null;
+		    protected int[][] occurrenceMap = null;
+		    protected List<Integer> clauseCache = null;
 		    
-		    protected List<List<Integer>> clauses;
-		    protected List<Integer>[] occurrenceMap = null;
-		    protected ImplicationGraph implicationGraph = null;
-		    protected SCCGraph sccGraph;
-		    
+		    protected SCCGraph sccGraph = null;
+		    		    
 		    //  entries [0,...,numVars-1] for positive literals
 		    //  entries [numVars,...,2*numVars-1] for negative literals
 	   
@@ -26,65 +26,115 @@ public class CnfSatInstance
 		    {
 		    	setNumClauses(0);
 		    	setNumVars(0);
-		    	clauses = new ArrayList<List<Integer>>();
+		    	clauses = null;
+		    	originalClauses = null;
 		    	occurrenceMap = null;
 		    }
 		    
-		    //Computes the implication graph given the clauses in the cnf
-		    public void computeImplicationGraph(){
-		    	System.out.println("Generating implication graph for " + (getNumVars() * 2) + " literals ... ");
-		    	implicationGraph = new ImplicationGraph(getNumVars() * 2 + 1);
-		    	for(int i = 0;i < getNumVars() * 2 + 1; i++){
-		    		implicationGraph.edges[i] = new LinkedList<Integer>();
-		    	}
-		    	for(List<Integer> clause: clauses){
-		    		implicationGraph.addClause(clause);
-		    	}
-		    	System.out.println(implicationGraph);
+		    public CnfSatInstance(int[][] clauses, int numClauses, int numVars){
+		    	this.clauses = clauses;
+		    	this.numClauses = numClauses;
+		    	this.numVars = numVars;
 		    }
 		    
+		    public void initialise(){
+	    		this.knownAssignments = new int[numVars];
+		    	this.occurrenceMap=computeOccurrenceMap(this.clauses,this.numVars);
+		    	this.clauses=simplify(clauses);
+		    }
+		    		    
 		    //Computes the strongly connected components in the implication graph
 		    public void computeSCCGraph(){
-		    	if(implicationGraph == null){
-		    		computeImplicationGraph();
-		    	}
-		    	this.sccGraph = new SCCGraph(this.implicationGraph);
+		    	sccGraph = new SCCGraph(getNumVars() * 2 + 1,clauses,knownAssignments);
 		    }
 		    
 		    public boolean solve(){
-		    	if(this.sccGraph == null){
-		    		computeSCCGraph();
+		    	if(this.hasEmptyClauses()==true){
+		    		return false;
 		    	}
-		    	boolean out = this.sccGraph.evaluate();
-		    	System.out.println(sccGraph);
-		    	return out;
+		    	else if(this.hasNoClauses()==true){
+		    		System.out.println("1) FORMULA SATISFIABLE");
+		    		for (int i : this.knownAssignments){
+		    			System.out.print((i==0?1:i)+" ");
+		    		}
+		    		System.out.println();
+		    		return true;
+		    	}
+		    	else{
+			    	if(this.sccGraph == null){
+			    		computeSCCGraph();
+			    	}
+			    	boolean out = this.sccGraph.evaluate();
+			    	return out;
+		    	}
 		    }
 		    
-		    //generate lit -> clause map for lookup
-		    //caching this makes the computation of different views a lot faster
-		    @SuppressWarnings("unchecked")
-		    public void computeOccurrenceMap()
-		    {
-		    	System.out.println("Generating occurrence map for " + (getNumVars() * 2) + " literals ... ");
-		    	occurrenceMap = (List<Integer>[]) new List[getNumVars() * 2];
-		    	for (int i = 0; i < getNumVars() * 2; i++)
-		    	{
-		    		occurrenceMap[i] = new LinkedList<Integer>();
-		    	}
-		    	for (int i = 1; i <= clauses.size(); i++)
-		    	{
-		    		List<Integer> clause = clauses.get(i-1);
-		    		for (int literal : clause)
-		    		{
-		    			int pos = literal;
-		    			if (literal < 0) pos = getNumVars() + Math.abs(literal);
-		    			occurrenceMap[pos-1].add(i);
+		    public boolean verifySolution(){
+		    	for(int[] clause : originalClauses){
+		    		int clauseSum = 0;
+		    		for(Integer term: clause){
+		    			clauseSum += this.sccGraph.knownAssignments[term>0?term-1:this.getNumVariables()-term-1];
+		    		}
+		    		if(clauseSum==0){
+		    			System.out.println(false);
+		    			return false;
 		    		}
 		    	}
-		    	for(List<Integer> l : occurrenceMap)
-		    		System.out.println("Occurrence Map: " + l);
-		    	System.out.println("Ready!");
+		    	System.out.println(true);
+		    	return true;
 		    }
+		    
+		    public int getNumOccurringClauses(int[][] clauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : getOccurringClauses(clauses, literal)){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    
+		    public int getNumOccurringClauses(int[] occurringClauses, int literal){
+		    	int ret = 0;
+		    	for(int occurrence : occurringClauses){
+		    		ret += occurrence;
+		    	}
+		    	return ret;
+		    }
+		    
+		    /**
+		     * Creates a 2D array Map of numClauses by numVars * 2
+		     * 0 denotes that the literal is not present in that clause
+		     * 1 denotes that the literal is present
+		     * Has absolutely no dependence on the calling instance
+		     * 
+		     * @return An occurrence map corresponding to the clauses, numClauses and numVars given
+		     */
+			public int[][] computeOccurrenceMap(int[][] clauses, int numVars)
+		    {
+			    //  entries [0,...,numVars-1] for positive literals
+			    //  entries [numVars,...,2*numVars-1] for negative literals
+				
+		    	occurrenceMap = new int[clauses.length][numVars * 2];
+		    	for (int i = 0; i < clauses.length; i++)
+		    	{
+		    		for (int literal : clauses[i])
+		    		{
+		    			int pos = literal > 0 ? literal: numVars + Math.abs(literal);
+		    			occurrenceMap[i][pos - 1] = 1;
+		    		}
+		    	}
+		    	return occurrenceMap;
+		    }
+		    
+			public int[] occurrenceNum(int[][] occurrenceMap){
+				int[] occurrenceNum = new int[occurrenceMap[0].length];
+				for(int clause = 0; clause < occurrenceMap.length; clause++){
+					for(int var = 0; var < occurrenceMap[0].length; var++){
+						if(occurrenceMap[clause][var] == 1)
+							occurrenceNum[var]++;
+					}
+				}
+				return occurrenceNum;
+			}
 		    
 		    public int getNumClauses()
 		    {
@@ -96,10 +146,15 @@ public class CnfSatInstance
 		    	return getNumVars();
 		    }
 	
-		    public List<List<Integer>> getClauses()
+		    public int[][] getClauses()
 		    {
 		    	return clauses;
 		    }
+		    
+		    public int[][] getOriginalClauses() {
+				return originalClauses;
+			}
+
 	
 		    public void setNumVars(int numVars)
 		    {
@@ -114,94 +169,164 @@ public class CnfSatInstance
 		    public void setNumClauses(int numClauses)
 		    {
 		    	this.numClauses = numClauses;
-	}
+		    	
+		    }
+		    
+		    public int[] getKnownAssignments() {
+				return knownAssignments;
+			}
+		    
+		    /**
+		     * Returns an array where each element represents the 
+		     * presence of the literal in the clause
+		     * 
+		     * @param clauses
+		     * @param literal
+		     * @return
+		     */
+		    public int[] getOccurringClauses(int[][] clauses, int literal){
+		    	int[] occurringClauses = new int[clauses.length];
+		    	for (int i = 0; i < clauses.length; i++)
+		    	{
+		    		for (int lit : clauses[i])
+		    		{
+		    			if(lit == literal){
+		    				occurringClauses[i] = 1;
+		    			}
+		    		}
+		    	}
+		    	return occurringClauses;
+		    }
+
+		    public int sizeClause(int[] clause){
+				int ret = 0;
+				for(int i : clause)
+					ret += i != 0 ? 1 : 0;
+				return ret;
+			}
+			
+			public int getVarFromUnit(int[] clause){
+				if (sizeClause(clause) != 1)
+					return 0;
+				else{
+					for(int i : clause){
+						if(i != 0)
+							return i;
+					}
+				}
+				return 0;
+			}
+			
+			/**
+			 * Returns a given formula assuming the assignment denoted by var
+			 * 
+			 * @param clauses
+			 * @param var
+			 * @return
+			 */
+			public int[][] givenVar(int[][] clauses, int var){
+		    	int[] posOccurrences = getOccurringClauses(clauses, var);
+		    	
+		    	int numNewClauses = clauses.length - getNumOccurringClauses(posOccurrences, var);
+		    	int[][] newClauses = new int [numNewClauses][3];
+		    	
+		    	int[][] negRemoved = new int[clauses.length][3];
+		    	for(int clause = 0; clause < negRemoved.length; clause++){
+		    		for(int lit = 0; lit < 3; lit++){
+		    			negRemoved[clause][lit] = clauses[clause][lit] == -var ?  0 : clauses[clause][lit];
+		    		}
+		    	}
+		    	
+		    	int writeClausePos = 0;
+		    	for(int clause = 0; clause < negRemoved.length; clause++){
+		    		if(posOccurrences[clause] == 0){
+		    			for(int lit = 0; lit < 3; lit++){
+		    				newClauses[writeClausePos][lit] = negRemoved[clause][lit];
+		    			}
+		    			writeClausePos++;
+		    		}
+		    	}
+		    	
+		    	return newClauses;
+		    }
 
 		    /**
-		     * Takes two clauses and computes their resolvent.
-		     * The resolvent is the clause (C1 - v) union (C2 - ~v) where C1 and C2 have only v as a
-		     * common variable. This is useful as any assignment that satisfies C1 and C2 must
-		     * satisfy their resolvent as well.
-		     * 
-		     * @param clause1 clause containing var
-		     * @param clause2 clause containing negation of var
-		     * @param var common variable to both clauses
-		     * @return the resolvent of clause1 and clause2
+		     * Removes unit clauses from the formula
 		     */
-		    public List<Integer> resolvent(List<Integer> clause1, List<Integer> clause2, Integer var){
-		    	List<Integer> resolvent = new LinkedList<Integer>();
-		    	boolean varPresent1 = false;
-		    	boolean varPresent2 = false;
-		    	
-		    	for (Integer i : clause1){
-		    		if(!i.equals(var))
-		    			resolvent.add(i);
-		    		else
-		    			varPresent1 = true;
-		    	}
-		    	
-		    	for (Integer i : clause2){
-		    		if (!i.equals(new Integer(-var.intValue())))
-		    			resolvent.add(i);
-		    		else
-		    			varPresent2 = true;
-		    	}
-		    	
-		    	if(varPresent1 && varPresent2)
-		    		return resolvent;
-		    	else{
-		    		System.err.println("Error: resolvent did not find correct variables");
-		    		return null;
-		    	}
-		    		
-		    }
-		    
-		    public Integer checkResolvence(List<Integer> clause1, List<Integer> clause2){
-		    	Integer variable = new Integer(0);
-		    	
-		    	for(Integer i: clause1){
-		    		for(Integer j: clause2){
-		    			if(i.equals(new Integer(-j.intValue())) && variable.equals(new Integer(0)))
-		    				variable = i;
-		    			else if ((i.equals(new Integer(-j.intValue())) ||  i.equals(new Integer(j.intValue())))){
-		    				return new Integer(0);
+		    public int[][] eliminateUnitClauses(int[][] clauses){
+		    	boolean unitClauseFound = true;
+		    	int[][] newFormula = clauses;
+		    	while(unitClauseFound) { //always called on the first iteration
+		    		unitClauseFound = false; //assume unit clause not found
+		    		for(int[] clause : newFormula){
+		    			int var = getVarFromUnit(clause);
+		    			if(var != 0){
+		    				newFormula = givenVar(newFormula, var);
+		    				unitClauseFound = true;
 		    			}
 		    		}
 		    	}
-		    	return variable;
+		    	return newFormula;
 		    }
-		    
-		    //TODO: improve the resolution function by binary searching a history of past clause comparisons
-		    
-		    public void createResolution(){
-		    	while(resolutionIteration())
-		    		computeOccurrenceMap();
-		    }
-		    
-		    //TODO: compare the resolution algorithm with the original PPSZ to ensure fast run-time
-		    private boolean resolutionIteration(){
-		    	boolean resFound = false;
-		    	for(int i = 1; i <= numVars; i++){
-		    		
-		    		if(!occurrenceMap[i - 1 + numVars].isEmpty()){
-		    			
-		    			for(int j : occurrenceMap[i - 1 + numVars]){
-		    				
-		    				for(int k : occurrenceMap[i - 1]){
-		    					
-			    				int commonVar = (int) checkResolvence(clauses.get(k - 1), clauses.get(j-1));
-			    				if(commonVar != 0){
-			    					List<Integer> res = resolvent(clauses.get(k-1), clauses.get(j-1), commonVar);
-			    					if(clauses.lastIndexOf(res) == -1){
-			    						clauses.add(res);
-			    						resFound = true;
-			    						numClauses++;
-			    					}
-			    				}
-		    				}
-		    			}
+		   
+		    /**
+		     * Dependent on numVars
+		     * @param clauses
+		     * @return
+		     */
+		    public int[][] eliminatePureLiterals(int[][] clauses){
+		    	int[][] newFormula = clauses;
+		    	for(int i = 0; i < numVars; i++){
+		    		int numPosOccurr = getNumOccurringClauses(newFormula, i);
+		    		int numNegOccurr = getNumOccurringClauses(newFormula, -i);
+		    		if(numPosOccurr == 0 && numNegOccurr != 0){ //if the literal i does not appear
+		    			newFormula = givenVar(newFormula, -(i + 1));
+		    		}
+		    		else if(numPosOccurr != 0 && numNegOccurr == 0){
+		    			newFormula = givenVar(newFormula, i + 1);
 		    		}
 		    	}
-		    	return resFound;
+		    	
+		    	return newFormula;
+		    }
+
+		    /**
+		     * Uses array implementation. Requires allocation and deallocation of 
+		     * large amounts of space due to the array implementations that remove the variables.
+		     * 
+		     * @param clauses
+		     * @return
+		     */
+		    public int[][] simplify(int[][] clauses){
+		    	boolean changesMade = true;
+		    	int[][] newFormula = clauses;
+		    	while(changesMade){
+		    		changesMade = false;
+		    		int[][] noUnitClauses = eliminateUnitClauses(newFormula);
+		    		if(noUnitClauses != newFormula){ //equality can be checked this way because givenVar() and elimnateUnitClauses() only change addresses if changes are made
+		    			newFormula = noUnitClauses;
+		    			changesMade = true;
+		    		}
+		    		int[][] noPures = eliminatePureLiterals(newFormula);
+		    		if(noPures != newFormula){ //equality can be checked this way because givenVar() and elimnatePureLiterals() only change addresses if changes are made
+		    			newFormula = noPures;
+		    			changesMade = true;
+		    		}
+		    	}
+		    	return newFormula;
+		    }
+		    private boolean hasEmptyClauses(){
+		    	for(int[] clause : clauses){
+		    		if(clause.length==0){
+		    			System.out.println("FORMULA UNSATISFIABLE");
+		    			return true;
+		    		}
+		    	}
+		    	return false;
+		    }
+		    
+		    private boolean hasNoClauses(){
+		    	return this.clauses.length == 0;
 		    }
 		    
 		    public String toString(){
