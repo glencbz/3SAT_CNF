@@ -1,0 +1,5 @@
+Thank you for trying out the 2SAT Randomized solver. This solver makes use of Papadimitriou's algorithm, and is a form of a random walk. It works by flipping variables on and off in order to make sure that all the clauses work. This works in worst case O(n^2) time, but is generally faster than that because of the randomization.
+
+In order for the randomized algorithm to work, please open all three .java files, and then edit the path of the file in CNFSolver.java, under the main function. The path that needs to be changed is the parsefile function. Test cases have been provided so do put the file name in. The output will be the words "FORMULA SATISFIABLE" as well as the assignment of the variables that satisfied the expression. If not, FORMULA UNSATISFIABLE will appear. The time taken will also be measured, and displayed in ms. 
+
+If you require more information about the algorithms, please read the report. Thank you!

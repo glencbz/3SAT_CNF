@@ -67,10 +67,10 @@ public class CnfSatInstance
 					solved = true; //mark boolean value as true,
 					break; //and break out of the current loop
 				}
-				int r = new Random().nextInt(2); //randomly generate a variable between 0 and 1. 
+				int randomVariable = new Random().nextInt(2); //randomly generate a variable between 0 and 1. 
 				int random0 = randomClause.get(0); //get the first literal from the random clause
 				int random1 = randomClause.get(1); //get the second literal from the random clause
-				if(r == 1) {
+				if(randomVariable == 1) {
 					//flip the bits for the boolean variables in the clause and variable array
 					Boolean b = booleanClause.get(Math.abs(random0)); 
 					booleanClause.set(Math.abs(random0), !b);
