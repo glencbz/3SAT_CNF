@@ -40,7 +40,8 @@ public class SATSolverTest {
 //        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/largeSat.cnf");
 //        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/largeUnsat.cnf");
 //        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/s8Sat.cnf");
-        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/aim-50-1_6-yes1-4.cnf");
+//        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/aim-50-1_6-yes1-4.cnf");
+        ArrayList<Formula> listOfFormulas = AwesomeCnfParser.parseFile("src/sat/generated2SAT.cnf");
         long parseTime = System.nanoTime();
         long parseTimeTaken = parseTime - parseStarted;
 
