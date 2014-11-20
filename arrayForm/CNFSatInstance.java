@@ -2,13 +2,17 @@ package arrayForm;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;	
+import java.util.Set;
 import java.util.Stack;
+
 
 public class CNFSatInstance
 	{
+			static final int maxClauseSize = 3;
 			private int numClauses;
 		    private int numVars;
 		    
@@ -18,10 +22,14 @@ public class CNFSatInstance
 		    private int[] occurrenceNums = null;
 		    private int[] deleted = null; 
 		    private boolean changeMade = false;
-
-		    Stack<History> previousStates = null;
 		    
-		    int undoStackNum = 0;
+		    private boolean hasEmptyClause = false;
+		    Set<Integer> unsatisfiedClauses = null;
+		    
+		    private Stack<History> previousStates = null;
+		    
+		    private int undoStackNum = 0;
+		    
 		    
 		    public boolean isChangeMade() {
 				return changeMade;
@@ -30,8 +38,6 @@ public class CNFSatInstance
 			public void setChangeMade(boolean changeMade) {
 				this.changeMade = changeMade;
 			}
-			
-		    
 			
 			public CNFSatInstance(int numClauses, int numVars,
 					int[] knownAssignments, int[][] clauses,
@@ -47,6 +53,7 @@ public class CNFSatInstance
 				this.deleted = deleted;
 				this.previousStates = new Stack<History>();
 				this.changeMade = changeMade;
+				this.hasEmptyClause = emptyClauseCheck();
 			}
 
 			public CNFSatInstance(){
@@ -65,6 +72,8 @@ public class CNFSatInstance
 		    	occurrenceNums = new int[numVars * 2];
 		    	occurrenceMap = computeOccurrenceMap(clauses, numVars, occurrenceNums);
 		    	previousStates = new Stack<History>();
+				this.hasEmptyClause = emptyClauseCheck();
+				this.unsatisfiedClauses = computeUnsatisfiedClauses();
 		    }
 		    
 /*		    public CNFSatInstance(int[][] clauses, int numVars, int[][] occurrenceMap, int[] occurrenceNums, int[] deleted, int[] knownAssignments){
@@ -129,6 +138,55 @@ public class CNFSatInstance
 		    	return occurMap;
 		    }
 		    
+		    public void removeFromUnsatisfiedClauses(List<Integer> unsat, int var){
+		    	int pos = var > 0 ? var - 1 : Math.abs(var) - 1 + numVars;
+		    	for(int i : occurrenceMap[pos]){
+		    		if (i == 0)
+		    			break;
+		    		unsat.remove(new Integer(i));
+		    	}
+		    }
+		    
+		    public void restoreToUnsatisfiedClauses(List<Integer> unsat, int var){
+		    	int pos = var > 0 ? var - 1 : Math.abs(var) - 1 + numVars;
+		    	for(int i : occurrenceMap[pos]){
+		    		if (i == 0)
+		    			break;
+		    		if(!unsat.contains(new Integer(i)))
+		    			unsat.add(new Integer(i));
+		    		}
+		    }
+		    
+		    public Set<Integer> getUnsatisfiedClauses() {
+				return unsatisfiedClauses;
+			}
+
+			private Set<Integer> computeUnsatisfiedClauses(){
+		    	Set<Integer> unsat = new HashSet<Integer>();
+		    	for(int i = 1; i < numClauses; i++)
+		    		unsat.add(i);
+		    	for(int i = 0; i < knownAssignments.length; i++){
+		    		if (knownAssignments[i] == 0)
+		    			continue;
+		    		int pos = knownAssignments[i] > 0 ? i : i + numVars;
+		    		
+		    		for(int clause : occurrenceMap[pos]){
+		    			if (clause == 0)
+		    				break;
+		    			unsat.remove(new Integer(clause));
+		    		}
+		    	}
+		    	return unsat;
+		    }
+		    
+		    private boolean emptyClauseCheck(){
+		    	for(int[] clause : clauses){
+		    		if (sizeClause(clause) == 0)
+		    			return false;
+		    	}
+		    	return true;
+		    }
+		    
 			public int sizeClause(int[] clause){
 				int ret = 0;
 				for(int i : clause)
@@ -153,6 +211,7 @@ public class CNFSatInstance
 					this.setChangeMade(false);
 					return;
 				}
+				this.setChangeMade(true);
 				int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
 				
 			    int knownAssignmentsChanges = 0;
@@ -163,23 +222,29 @@ public class CNFSatInstance
 			    List<Integer> deletedChanges = new LinkedList<Integer>();
 			
 				int[] posOccurrences = occurrenceMap[posPosition];
-				
+				List<Integer> unsatisfiedClausesChanges = new LinkedList<Integer>();
 		    	for(int clause: posOccurrences){
 		    		if (clause == 0)
 		    			break;
+		    		unsatisfiedClauses.remove(new Integer(clause));
+		    		unsatisfiedClausesChanges.add(clause);
 		    		deleted[clause-1] = 1;
 		    		deletedChanges.add(clause-1);
 		    	}
 		    	
 		    	int[] negOccurrences = occurrenceMap[negPosition];
+		    	boolean hadEmptyClause = hasEmptyClause;
 		    	
 				for(int clause : negOccurrences){
-		    		if (clause == 0)
+		    		if (clause ==  0)
 		    			break;
 		    		occurrenceMapChanges.put(clause, copyArray(clauses[clause - 1]));
-		    		for(int i = 0; i < 3; i++){
+		    		for(int i = 0; i < maxClauseSize; i++){
 		    			if(clauses[clause - 1][i] == -var)
 		    				clauses[clause - 1][i] = 0;
+		    		}
+		    		if(sizeClause(clauses[clause - 1]) == 0){
+		    			hasEmptyClause = true;
 		    		}
 		    	}
 				
@@ -201,7 +266,7 @@ public class CNFSatInstance
 
 				previousStates.push(new History(knownAssignmentsChanges, lastGivenVar, 
 						clausesChanges, occurrenceMapChanges, 
-						occurrenceNumsChanges, deletedChanges));
+						occurrenceNumsChanges, deletedChanges, hadEmptyClause, unsatisfiedClausesChanges));
 		    }
 
 			public void undoChanges(){
@@ -226,8 +291,16 @@ public class CNFSatInstance
 						break;
 					clauses[clause-1] = previousState.getOccurrenceMapChanges().get(clause);
 				}
+				
+				hasEmptyClause = previousState.hadEmptyClauses();
+				for(Integer i : previousState.getUnsatisfiedClausesChanges())
+					unsatisfiedClauses.add(i);
 			}
 			
+			public void undoAllChanges(){
+				while(!previousStates.isEmpty())
+					undoChanges();
+			}
 			/*public CNFSatInstance givenVarOccur(int var){
 
 				int posPosition = var > 0? var - 1 : -var + numVars - 1;
@@ -383,11 +456,6 @@ public class CNFSatInstance
 		    }
 		    
 
-			/**
-			 * Depreciated
-			 * @param clause
-			 * @return
-			 */
 			public int getVarFromUnit(int[] clause){
 				if (sizeClause(clause) != 1)
 					return 0;
@@ -507,6 +575,14 @@ public class CNFSatInstance
 		    	}
 		    	return numOccur;
 		    }*/
+
+			public boolean hasEmptyClause() {
+				return hasEmptyClause;
+			}
+
+			public void setHasEmptyClause(boolean hasEmptyClause) {
+				this.hasEmptyClause = hasEmptyClause;
+			}
 		    
 /*		    public int[] getOccurringClauses(List<List<Integer>> clauses, int literal){
 		    	int[] occurringClauses = new int[clauses.size()];
@@ -742,12 +818,15 @@ class History{
     Map<Integer, int[]> occurrenceMapChanges = null;
     Map<Integer, Integer> occurrenceNumsChanges = null;
     List<Integer> deletedChanges = null;
+    boolean hadEmptyClauses = false;
+    List<Integer> unsatisfiedClausesChanges = null;
     
 	public History(int knownAssignmentsChanges, int lastGivenVar,
 			Map<Integer, int[]> clausesChanges,
 			Map<Integer, int[]> occurrenceMapChanges,
 			Map<Integer, Integer> occurrenceNumsChanges,
-			List<Integer> deletedChanges) {
+			List<Integer> deletedChanges, boolean hadEmptyClauses,
+			List<Integer> unsatisfiedClausesChanges) {
 		super();
 		this.knownAssignmentsChanges = knownAssignmentsChanges;
 		this.lastGivenVar = lastGivenVar;
@@ -755,9 +834,23 @@ class History{
 		this.occurrenceMapChanges = occurrenceMapChanges;
 		this.occurrenceNumsChanges = occurrenceNumsChanges;
 		this.deletedChanges = deletedChanges;
+		this.hadEmptyClauses = hadEmptyClauses;
+		this.unsatisfiedClausesChanges = unsatisfiedClausesChanges;
 	}
 	public int getKnownAssignmentsChanges() {
 		return knownAssignmentsChanges;
+	}
+	public boolean hadEmptyClauses() {
+		return hadEmptyClauses;
+	}
+	public void setHadEmptyClauses(boolean hadEmptyClauses) {
+		this.hadEmptyClauses = hadEmptyClauses;
+	}
+	public List<Integer> getUnsatisfiedClausesChanges() {
+		return unsatisfiedClausesChanges;
+	}
+	public void setUnsatisfiedClausesChanges(List<Integer> unsatisfiedClausesChanges) {
+		this.unsatisfiedClausesChanges = unsatisfiedClausesChanges;
 	}
 	public void setKnownAssignmentsChanges(int knownAssignmentsChanges) {
 		this.knownAssignmentsChanges = knownAssignmentsChanges;

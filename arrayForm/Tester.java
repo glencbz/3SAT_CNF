@@ -7,40 +7,17 @@ import java.util.Set;
 
 public class Tester {
 	public static void main(String[] args){
-		CNFSatInstance test = CNFparser.parseDimacsCnfFile("src/s8Sat.cnf");
-		System.out.println(test);
-		System.out.println(Arrays.toString(test.getOccurrenceNums()));
+		CNFSatInstance test = CNFparser.parseDimacsCnfFile("src/testcase.cnf");
+		Solver solver = new Solver(test);
+		System.out.println(solver.getCNF());
+		System.out.println(solver.getCNF().getUnsatisfiedClauses());
+		System.out.println("..");
+		solver.getCNF().simplify();
+		System.out.println(solver.getCNF().getUnsatisfiedClauses());
+		System.out.println("..");
 
-		System.out.println("....");
-		test.givenVarMutator(1);
-
-		System.out.println(test);
-		System.out.println(Arrays.toString(test.getOccurrenceNums()));
-		System.out.println("....");
-		
-		test.givenVarMutator(3);
-
-		System.out.println(test);
-		System.out.println(Arrays.toString(test.getOccurrenceNums()));
-		System.out.println("....");
-		
-		test.undoChanges();
-		System.out.println(test);
-		System.out.println(Arrays.toString(test.getOccurrenceNums()));
-		System.out.println("....");
-
-		test.undoChanges();
-		System.out.println(test);
-		System.out.println(Arrays.toString(test.getOccurrenceNums()));
-		System.out.println("....");
-		
-		long started = System.nanoTime();
-		test.simplify();
-		
-		long time = System.nanoTime();
-	long timeTaken = time - started;
-	System.out.println("Time:" + timeTaken/1000000.0 + "ms");
-	System.out.println(test);
-	System.out.println("...");
+		System.out.println(solver.getCNF());
+		System.out.println(Arrays.toString(solver.getCNF().getKnownAssignments()));
+		System.out.println(Arrays.toString(solver.Rolf06()));
 	}
 }
