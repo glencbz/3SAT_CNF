@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * A class written to process a 2-SAT CNF into a strongly connected component graph required to solve the CNF
- * @author User
+ * A class written to process a 2-SAT CNF into a strongly connected component graph required 
+ * to solve the CNF problem
+ * @author Glen Choo, Goh Jia Hao, Lau Siaw Young, Nikhil Sharma, Tan Hao Qin
  *
  */
 public class SCCGraph{
@@ -25,7 +26,7 @@ public class SCCGraph{
 	private Stack<Integer> stack;
 	
 	//Actual SCC Graph Data
-	public ArrayList<ArrayList<Integer>> scc;
+	public LinkedList<Integer>[] scc;
 	public List<Integer>[] sccEdges;
 	public Integer[] sccSearch;
 	public int sccSize;
@@ -37,9 +38,10 @@ public class SCCGraph{
 	 * Constructor for the SCC Graph used in the CNFSolver
 	 * @param numberOfVertices The number of vertices in the graph
 	 * @param clauses The clauses in the CNF problem.
+	 * @param clauseRemoved 
 	 */
 	@SuppressWarnings("unchecked")
-	public SCCGraph(int numberOfVertices, int[][] clauses, int[] knownAssignments){	
+	public SCCGraph(int numberOfVertices, int[][] clauses, int[] knownAssignments, boolean[] clauseRemoved){	
 
 		this.edges = (List<Integer>[]) new List[numberOfVertices];
 		this.numberOfVertices = numberOfVertices;
@@ -48,19 +50,19 @@ public class SCCGraph{
 		this.stack = new Stack<Integer>();
 		this.id = new Integer[this.numberOfVertices];
 		this.lowlink = new Integer[this.numberOfVertices];
-		this.scc = new ArrayList<ArrayList<Integer>>();
+		this.scc = (LinkedList<Integer>[]) new LinkedList[numberOfVertices];
 		this.sccSearch = new Integer[this.numberOfVertices];
 		this.sccSize = 0;
 		this.knownAssignments = knownAssignments;	
 		
-    	System.out.println("Generating implication graph for " + (this.numberOfVertices) + " literals ... ");
     	for(int i = 0;i < this.numberOfVertices;i++){
     		this.edges[i] = new LinkedList<Integer>();
     	}
-    	for(int[] clause: clauses){
-    		this.addClause(clause);
+    	for(int i = 0;i<clauses.length;i++){
+    		if(!clauseRemoved[i]){
+        		this.addClause(clauses[i]);
+    		}
     	}
-    	System.out.println(this.printGraph());
     	this.generateSCC();
 		
 	}
@@ -90,12 +92,13 @@ public class SCCGraph{
 	/**
 	 * Generates the SCC for the implication graph. Uses Tarjan's algorithm
 	 */
-	public void generateSCC(){
+	private void generateSCC(){
 		for (int vertex = 1;vertex < this.numberOfVertices;vertex++){
 			if(this.id[vertex] == null){
 				visit(vertex);
 			}
 		}
+		this.getSCCEdges();
 	}
 	
 	/**
@@ -104,7 +107,6 @@ public class SCCGraph{
 	 */
 	public void visit(int v){
 		
-		System.out.println("Visiting node "+convert(v));
 		this.id[v] = this.index;
 		this.lowlink[v] = this.index;
 		this.index++;
@@ -126,7 +128,7 @@ public class SCCGraph{
 		// V is a root node
 
 		if(this.lowlink[v] == this.id[v]){
-			ArrayList<Integer> currentSCC = new ArrayList<Integer>();
+			LinkedList<Integer> currentSCC = new LinkedList<Integer>();
 			int poppedNode;
 			do {
 				poppedNode = this.stack.pop();
@@ -134,12 +136,12 @@ public class SCCGraph{
 				currentSCC.add(convert(poppedNode));
 			} while (poppedNode!=v);
 			if(currentSCC.size() != 0){
-				this.scc.add(currentSCC);
-				String out = "SCC "+sccSize+" found including vertices: ";
+				this.scc[sccSize]=currentSCC;
+/*				String out = "SCC "+sccSize+" found including vertices: ";
 				for(Integer i: currentSCC){
 					out = out.concat(i+" ");
 				}
-				System.out.println(out);
+				System.out.println(out);*/
 				sccSize+=1;
 			}
 		}
@@ -150,9 +152,9 @@ public class SCCGraph{
 	 * @return a boolean value showing its satisfiability, prints out the outcome as well
 	 */
 	public boolean evaluate(){
-		for(ArrayList<Integer> components:this.scc){
-			for(Integer component: components){
-				if(components.contains(-component)){
+		for(int i = 0;i<this.sccSize;i++){
+			for(Integer component: this.scc[i]){
+				if(this.scc[i].contains(-component)){
 					System.out.println("FORMULA UNSATISFIABLE");
 					return false;
 				}
@@ -162,52 +164,68 @@ public class SCCGraph{
 		this.getSolution();
 		return true;
 	}
-		
+	
+	/**
+	 * Calculates the edges in the SCC graph
+	 * Complexity O(c) since it examines every single edge in the graph
+	 */
 	@SuppressWarnings("unchecked")
-	public int[] getSolution(){
-			//Calculating SCC graph edges
-			this.sccEdges = new List[this.sccSize];
-			for (int i = 0 ; i < this.sccSize ; i++){
-				this.sccEdges[i] = new ArrayList<Integer>();
-				for (Integer j : this.scc.get(i)){
-					for (Integer k : this.edges[convert(j)]){
-						if(!this.sccEdges[i].contains(this.sccSearch[convert(k)])&&this.sccSearch[convert(k)]!=i){
-							this.sccEdges[i].add(this.sccSearch[convert(k)]);					
-						}
+	private void getSCCEdges(){
+		this.sccEdges = new List[this.sccSize];
+		for (int i = 0 ; i < this.sccSize ; i++){
+			this.sccEdges[i] = new ArrayList<Integer>();
+			for (Integer j : this.scc[i]){
+				for (Integer k : this.edges[convert(j)]){
+					if(!this.sccEdges[i].contains(this.sccSearch[convert(k)])&&this.sccSearch[convert(k)]!=i){
+						this.sccEdges[i].add(this.sccSearch[convert(k)]);					
 					}
-				}		
-			}
-			//Assigning arbitrary solution
-			for(int i = this.scc.size()-1; i>=0;i--){
-				ArrayList<Integer> components = this.scc.get(i);
+				}
+			}		
+		}
+	}
+	/**
+	 * Calculates the solution of the formula
+	 * Works only after the edges of the SCC graph is calculated
+	 * Complexity O(n + c) as it examines every single literal vertex and possibly all edges
+	 * @return solution of the formula
+	 */
+	private int[] getSolution(){
+		
+			//Recursive assignment of solution
+			for(int i = this.sccSize -1; i>=0;i--){
+				LinkedList<Integer> components = this.scc[i];
 				assignValue(i,components,false);
-				
 			}
-			StringBuffer solution = new StringBuffer();
+
 			for(int i = 0;i<this.knownAssignments.length;i++){
-				solution.append((this.knownAssignments[i]<0?0:1)+" ");
+				System.out.print(this.knownAssignments[i]<0?0:this.knownAssignments[i]);
+				System.out.print(" ");
+				if(i%2000==1999){
+					System.out.println();
+				}
 			}
-			System.out.println(solution);
+			System.out.println();
 			return this.knownAssignments;
 		}
 	
 	/**
-	 * Recursive assignment of a possible truth value for all variables in a SCC component graph
+	 * Recursive assignment of a possible truth value for all variables 
+	 * in a SCC component graph
 	 * @param components individual condensed graph from the SCC
 	 * @param value boolean value to be assigned
 	 */
-	public void assignValue(int i,ArrayList<Integer> components,boolean value){
+	private void assignValue(int i, List<Integer> components,boolean value){
 		for(int component:components){
 			int assignment = value?1:-1;
 			if(this.knownAssignments[Math.abs(component) - 1] == 0){
-				System.out.println(component+" is set to "+value);
 				this.knownAssignments[Math.abs(component) - 1] = component<0?-assignment:assignment;
+				//System.out.println("Literal "+(Math.abs(component) - 1) + " set to " + assignment);
 			}
 		}
 		if (this.sccEdges[i].size()!=0){
 			//Accounts for edges from components
 			for(Integer j:this.sccEdges[i]){
-				assignValue(j,this.scc.get(j),false);
+				assignValue(j,this.scc[j],false);
 			}
 		}
 	}
@@ -217,7 +235,7 @@ public class SCCGraph{
 	 * @param i, the index number of the literal given
 	 * @return the index number of the negation of the literal given
 	 */
-	public Integer negate(Integer i){
+	private Integer negate(Integer i){
 		if (i<0){
 			return -i;
 		}
@@ -227,12 +245,12 @@ public class SCCGraph{
 	}
 	
 	/**
-	 * TODO: REMOVE THIS FUNCTION ENTIRELY
-	 * Converts between negative indices used in printing and positive indices used in calculations
+	 * Converts between negative indices used in printing and 
+	 * positive indices used in calculations.
 	 * @param initial index
 	 * @return final converted index
 	 */
-	public Integer convert(Integer i){
+	private Integer convert(Integer i){
 		if( i < 0){
 			return this.numberOfVariables-i;
 		}
@@ -245,7 +263,8 @@ public class SCCGraph{
 	}
 	
 	/**
-	 * Prints out the details for the implication graph
+	 * Prints out the details for the implication graph. 
+	 * Not used in actual algorithm, only used in debugging.
 	 * @return the implication graph in the form of a string 
 	 */
 	public String printGraph(){
@@ -262,14 +281,15 @@ public class SCCGraph{
 	}
 	
 	/**
-	 * Prints out the scc graph
+	 * Prints out the strongly connected component graph. 
+	 * Not used in actual algorithm, only used in debugging.
 	 */
 	public String toString(){
 		StringBuffer out = new StringBuffer();
 		for(int i = 0;i < this.sccSize;i++){
 			out.append("Vertex "+i+" ( ");
-			for(int j = 0;j < this.scc.get(i).size();j++){
-				out.append(this.scc.get(i).get(j)+" ");
+			for(int j = 0;j < this.scc[i].size();j++){
+				out.append(this.scc[i].get(j)+" ");
 			}
 			out.append(") contains edges to the following vertices: ");
 			for(Integer j:this.sccEdges[i]){

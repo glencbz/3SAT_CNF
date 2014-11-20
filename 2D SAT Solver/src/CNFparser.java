@@ -40,7 +40,7 @@ public class CNFparser
 	            int numVars = Integer.parseInt(params[2]);
 	            int numClauses = Integer.parseInt(params[3]);
 	            //create an array to hold the clauses for 3 SAT
-	            int[][] clauses = new int[numClauses][3];
+	            int[][] clauses = new int[numClauses][2];
 	            int clauseCount = 0;
 	            int currentClauseCount = 0;
 	            int literal = 0;
