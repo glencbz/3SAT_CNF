@@ -1,12 +1,5 @@
 package project2d;
 
-
-/*
- * Modified from the CNF parser found on
- * http://kahina.org/trac/browser/trunk/src/org/kahina/logic/sat/io/cnf/DimacsCnfParser.java?rev=1349
- * 
- * 
- */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
@@ -15,7 +8,7 @@ import java.util.Scanner;
 
 public class CNFparser
 	{
-	public static CnfSatInstance parseDimacsCnfFile(String fileName)
+	public static CnfSatInstance parseFile(String fileName)
 		{
 			CnfSatInstance sat = new CnfSatInstance();
 			try
@@ -32,14 +25,14 @@ public class CNFparser
 
 	            if (!params[0].equals("p"))
 	            {
-	                System.err.println("ERROR: Dimacs CNF file appears to miss the problem line!");
+	                System.err.println("ERROR: CNF file appears to miss the problem line!");
 	                System.err.println("       Returning empty SAT instance!");
 	                in.close();
 	                return sat;
 	            }
 	            if (!params[1].equals("cnf"))
 	            {
-	                System.err.println("ERROR: Parsing a non-CNF Dimacs file with the Dimacs CNF parser!");
+	                System.err.println("ERROR: Non-CNF file!");
 	                System.err.println("       Returning empty SAT instance!");
 	            }
 	            sat.setNumVars(Integer.parseInt(params[2]));
@@ -65,10 +58,6 @@ public class CNFparser
 	                        }
 	                        else
 	                        {
-	                        	if(literal < 0) 
-	        						literal = literal + 1;
-	        					else 
-	        						literal = literal - 1;
 	                            currentClause.add(literal);
 	                        }
 	                    }
@@ -81,7 +70,7 @@ public class CNFparser
 	        }
 	        catch (FileNotFoundException e)
 	        {
-	            System.err.println("ERROR: Dimacs CNF file not found: " + fileName);
+	            System.err.println("ERROR: CNF file not found: " + fileName);
 	            System.err.println("       Returning empty SAT instance!");
 	        }
 	        return sat;
