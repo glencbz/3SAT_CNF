@@ -1,0 +1,28 @@
+How to use our 2-SAT Solver
+
+Our 2-SAT Solver uses four different classes in Java, 
+
+CNFsolver.java
+CNFparser.java
+CNFSatInstance.java
+SCCGraph.java
+
+To use our class, open up CNFSolver.java, you should see:
+
+public class CNFsolver {
+	public static void main(String[] args){
+
+		//Replace src/testcase.cnf with the cnf file that you want to solve
+		CnfSatInstance CNF = CNFparser.parseCnfFile("src/filename.cnf");
+		long started = System.nanoTime();
+		CNF.initialise();
+		CNF.solve();
+		long timeTaken = System.nanoTime() - started;
+		System.out.println("Time Taken: "+timeTaken/1000000.0 + "ms");
+
+	}
+}
+
+To use the 2-SAT Solver
+1) Place the cnf file you want to calculate in the src folder of your eclipse project with the classes provided
+2) By replacing the argument within CNFparser.parseCnfFile() in the second line of the main function with the path of the cnf file you want to use in this format. "src/filename.cnf"
