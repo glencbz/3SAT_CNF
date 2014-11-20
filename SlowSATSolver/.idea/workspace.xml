@@ -30,8 +30,8 @@
           <file leaf-file-name="EvenBetterDPLLSolver.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-3.02454" vertical-offset="2703" max-vertical-offset="4828">
-                  <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
+                <state vertical-scroll-proportion="-3.1809816" vertical-offset="3672" max-vertical-offset="4828">
+                  <caret line="94" column="44" selection-start-line="94" selection-start-column="44" selection-end-line="94" selection-end-column="44" />
                   <folding />
                 </state>
               </provider>
@@ -1177,14 +1177,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.02454" vertical-offset="2703" max-vertical-offset="4828">
-          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/sat/largeUnsat.cnf">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="4777" max-vertical-offset="102136">
@@ -1272,6 +1264,14 @@
             <element signature="e#28143#28144#0" expanded="true" />
             <element signature="e#28195#28196#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.1809816" vertical-offset="3672" max-vertical-offset="4828">
+          <caret line="94" column="44" selection-start-line="94" selection-start-column="44" selection-end-line="94" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>
