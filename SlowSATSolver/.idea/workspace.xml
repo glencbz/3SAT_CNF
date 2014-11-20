@@ -27,11 +27,63 @@
     <splitter split-orientation="horizontal" split-proportion="0.49715215">
       <split-first>
         <leaf>
-          <file leaf-file-name="EvenBetterDPLLSolver.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="EvenBetterDPLLSolver.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-3.1809816" vertical-offset="3672" max-vertical-offset="4828">
-                  <caret line="94" column="44" selection-start-line="94" selection-start-column="44" selection-end-line="94" selection-end-column="44" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="4186" max-vertical-offset="4828">
+                  <caret line="234" column="0" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNFSatInstance.java.LOCAL.1851.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.LOCAL.1851.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="9197">
+                  <caret line="20" column="14" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNFSatInstance.java.BASE.1851.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BASE.1851.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11237">
+                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="655" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#0#20121#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNFSatInstance.java.BACKUP.1851.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BACKUP.1851.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="2924" max-vertical-offset="17697">
+                  <caret line="33" column="31" selection-start-line="0" selection-start-column="0" selection-end-line="1035" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="DPLLBetterSolverTest.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolverTest.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.19171779" vertical-offset="164" max-vertical-offset="816">
+                  <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNFSatInstance.java.REMOTE.1851.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.REMOTE.1851.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="11938" max-vertical-offset="13617">
+                  <caret line="738" column="31" selection-start-line="0" selection-start-column="0" selection-end-line="795" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -45,20 +97,18 @@
             <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolver.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="3077">
-                  <caret line="44" column="8" selection-start-line="44" selection-start-column="8" selection-end-line="48" selection-end-column="9" />
+                  <caret line="47" column="23" selection-start-line="47" selection-start-column="23" selection-end-line="47" selection-end-column="23" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="CNFparser.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/CNFparser.java">
+          <file leaf-file-name="CNFSatInstance.java.orig" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.orig">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-17.538462" vertical-offset="1142" max-vertical-offset="1768">
-                  <caret line="94" column="28" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="28" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="17697">
+                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -78,6 +128,16 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="697">
                   <caret line="10" column="46" selection-start-line="10" selection-start-column="46" selection-end-line="10" selection-end-column="46" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNFSatInstance.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="1337" max-vertical-offset="8789">
+                  <caret line="412" column="29" selection-start-line="412" selection-start-column="29" selection-end-line="412" selection-end-column="29" />
                   <folding />
                 </state>
               </provider>
@@ -126,8 +186,8 @@
           <file leaf-file-name="CNFSatInstance.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/CNFSatInstance.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-0.68370605" vertical-offset="3607" max-vertical-offset="15249">
-                  <caret line="187" column="5" selection-start-line="187" selection-start-column="5" selection-end-line="187" selection-end-column="5" />
+                <state vertical-scroll-proportion="0.3258786" vertical-offset="8109" max-vertical-offset="15249">
+                  <caret line="489" column="35" selection-start-line="489" selection-start-column="35" selection-end-line="489" selection-end-column="35" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#798#799#0" expanded="true" />
@@ -220,6 +280,10 @@
         <option value="$PROJECT_DIR$/src/sat/s8SatSmaller.cnf" />
         <option value="$PROJECT_DIR$/src/ArrayFormDPLL/DPLLTester.java" />
         <option value="$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java" />
+        <option value="$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.LOCAL.1851.java" />
+        <option value="$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BACKUP.1851.java" />
+        <option value="$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.REMOTE.1851.java" />
+        <option value="$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BASE.1851.java" />
       </list>
     </option>
   </component>
@@ -750,14 +814,14 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39356434" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17079207" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14415042" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15841584" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16364902" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15841584" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32920793" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -828,44 +892,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/sat/env/Bool.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="224" max-vertical-offset="544">
-          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/sat/SATSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1056">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/sat/SATSolverTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="272" max-vertical-offset="1056">
-          <caret line="22" column="16" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/sat/env/Bool.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="224" max-vertical-offset="544">
-          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/sat/SATSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="990">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/sat/SATSolverTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="120" max-vertical-offset="990">
@@ -1071,14 +1097,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6012" max-vertical-offset="8789">
-          <caret line="412" column="29" selection-start-line="412" selection-start-column="29" selection-end-line="412" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/sat/SATSolver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="385" max-vertical-offset="4709">
@@ -1117,22 +1135,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2023">
           <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="3077">
-          <caret line="44" column="8" selection-start-line="44" selection-start-column="8" selection-end-line="48" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolverTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="816">
-          <caret line="24" column="24" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -1201,10 +1203,84 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3519" max-vertical-offset="4828">
+          <caret line="234" column="0" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.orig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="17697">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.LOCAL.1851.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="9197">
+          <caret line="20" column="14" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BACKUP.1851.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2924" max-vertical-offset="17697">
+          <caret line="33" column="31" selection-start-line="0" selection-start-column="0" selection-end-line="1035" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1337" max-vertical-offset="8789">
+          <caret line="412" column="29" selection-start-line="412" selection-start-column="29" selection-end-line="412" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.REMOTE.1851.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="11938" max-vertical-offset="13617">
+          <caret line="738" column="31" selection-start-line="0" selection-start-column="0" selection-end-line="795" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/CNFSatInstance.java.BASE.1851.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11237">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="655" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#20121#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="3077">
+          <caret line="47" column="23" selection-start-line="47" selection-start-column="23" selection-end-line="47" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProfilingStuff/DPLLBetterSolverTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.19171779" vertical-offset="164" max-vertical-offset="816">
+          <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/CNFSatInstance.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.68370605" vertical-offset="3607" max-vertical-offset="15249">
-          <caret line="187" column="5" selection-start-line="187" selection-start-column="5" selection-end-line="187" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.3258786" vertical-offset="8109" max-vertical-offset="15249">
+          <caret line="489" column="35" selection-start-line="489" selection-start-column="35" selection-end-line="489" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#798#799#0" expanded="true" />
@@ -1264,14 +1340,6 @@
             <element signature="e#28143#28144#0" expanded="true" />
             <element signature="e#28195#28196#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ArrayFormDPLL/EvenBetterDPLLSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.1809816" vertical-offset="3672" max-vertical-offset="4828">
-          <caret line="94" column="44" selection-start-line="94" selection-start-column="44" selection-end-line="94" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
