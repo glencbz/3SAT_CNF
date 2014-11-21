@@ -110,6 +110,7 @@ public class DPLLBetterSolver {
 
             int literal = findLiteralIn(smallestClause);
             int[][] reducedFormula = testSATinstance.givenVar(formula, literal);
+
             boolean result = recurSolve(reducedFormula);
 
             if (result) {

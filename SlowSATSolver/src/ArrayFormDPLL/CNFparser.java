@@ -18,7 +18,7 @@ public class CNFparser
                 problemLine = in.nextLine();
             }
             //process the problem line
-            String[] params = problemLine.split("\\s");
+            String[] params = problemLine.split("\\s+");
 
             if (!params[0].equals("p"))
             {

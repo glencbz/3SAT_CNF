@@ -222,7 +222,7 @@ public class CNFSatInstance
 				long started = System.nanoTime();
 
 				int[] posOccurrences = getOccurringClauses(clauses, var);
-		    	
+
 		    	int numNewClauses = clauses.length - getNumOccurringClauses(posOccurrences, var);
 		    	int[][] newClauses = new int [numNewClauses][3];
 		    	

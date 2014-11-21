@@ -5,7 +5,6 @@ import sat.formula.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,10 +12,10 @@ import java.util.regex.Pattern;
 /**
  * Created by JiaHao on 18/11/14.
  */
-public class AwesomeCnfParser {
+public class slowCnfParser {
 
     public static void main(String[] args) {
-        ArrayList<Formula> parsedFormulas = AwesomeCnfParser.parseFile("src/sat/s8.cnf");
+        ArrayList<Formula> parsedFormulas = slowCnfParser.parseFile("src/sat/s8.cnf");
         System.out.println(parsedFormulas);
 
     }

@@ -15,7 +15,8 @@ public class EvenBetterDPLLSolver {
 
         testSatInstance = satInstance;
 
-        System.out.println("Simplifying formula...");
+//        System.out.println("Simplifying formula...");
+//        System.out.println("simplyfy 0");
         testSatInstance.simplify();
 //
         System.out.println("Now solving...");
@@ -46,7 +47,7 @@ public class EvenBetterDPLLSolver {
 
     public static CNFSatInstance testSatInstance;
     public static boolean recurSolve() {
-
+//        System.out.println("recursing");
         // Init some variables to reduce operations
 
         // Smallest clause
@@ -143,6 +144,7 @@ public class EvenBetterDPLLSolver {
 
 
             testSatInstance.givenVarMutator(literal);
+//            System.out.println("simplyfy 1");
             testSatInstance.simplify();
 
             boolean result = recurSolve();
@@ -172,6 +174,7 @@ public class EvenBetterDPLLSolver {
 
 
         testSatInstance.givenVarMutator(literal);
+//        System.out.println("simplify2");
         testSatInstance.simplify();
 
         boolean result = recurSolve();
@@ -185,6 +188,7 @@ public class EvenBetterDPLLSolver {
             int negatedLiteral = literal*-1;
 
             testSatInstance.givenVarMutator(negatedLiteral);
+//            System.out.println("simplyfy3");
             testSatInstance.simplify();
             boolean negatedResult = recurSolve();
 

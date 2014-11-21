@@ -23,7 +23,8 @@ public class DPLLBetterSolverTest {
 //        CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/largeSat.cnf");
 //            CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/aim-50-1_6-yes1-4.cnf");
 //        CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/generated2SAT.cnf");
-            CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/s8Sat.cnf");
+            CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/sat3large.cnf");
+
         long parseTime = System.nanoTime();
         long parseTimeTaken = parseTime - parseStarted;
 

@@ -2,11 +2,10 @@ package ArrayFormDPLL;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Random;
 import java.util.Stack;
 
 
@@ -22,13 +21,13 @@ public class CNFSatInstance
     private int[] occurrenceNums = null;
     private int[] deleted = null;
     private boolean changeMade = false;
+    private int shortestClauseLength = 3;
 
     private boolean hasEmptyClause = false;
-    Set<Integer> unsatisfiedClauses = null;
+    List<Integer> unsatisfiedClauses = null;
 
     private Stack<History> previousStates = null;
-
-    private int undoStackNum = 0;
+    private Stack<Integer> numUndoSimplify = new Stack<Integer>();
 
 
     public boolean isChangeMade() {
@@ -74,6 +73,7 @@ public class CNFSatInstance
         previousStates = new Stack<History>();
         this.hasEmptyClause = emptyClauseCheck();
         this.unsatisfiedClauses = computeUnsatisfiedClauses();
+        this.shortestClauseLength = sizeClause(clauses[getSmallestClause()]);
     }
 
     /*		    public CNFSatInstance(int[][] clauses, int numVars, int[][] occurrenceMap, int[] occurrenceNums, int[] deleted, int[] knownAssignments){
@@ -157,12 +157,12 @@ public class CNFSatInstance
         }
     }
 
-    public Set<Integer> getUnsatisfiedClauses() {
+    public List<Integer> getUnsatisfiedClauses() {
         return unsatisfiedClauses;
     }
 
-    private Set<Integer> computeUnsatisfiedClauses(){
-        Set<Integer> unsat = new HashSet<Integer>();
+    private List<Integer> computeUnsatisfiedClauses(){
+        List<Integer> unsat = new LinkedList<Integer>();
         for(int i = 1; i < numClauses; i++)
             unsat.add(i);
         for(int i = 0; i < knownAssignments.length; i++){
@@ -182,9 +182,9 @@ public class CNFSatInstance
     private boolean emptyClauseCheck(){
         for(int[] clause : clauses){
             if (sizeClause(clause) == 0)
-                return false;
+                return true;
         }
-        return true;
+        return false;
     }
 
     public int sizeClause(int[] clause){
@@ -205,12 +205,15 @@ public class CNFSatInstance
     public int[] getDeleted() {
         return deleted;
     }
+
     public void givenVarMutator(int var){
+
         int posPosition = var > 0? var - 1 : -var + numVars - 1;
         if (occurrenceNums[posPosition] == 0){
             this.setChangeMade(false);
             return;
         }
+
         this.setChangeMade(true);
         int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
 
@@ -235,13 +238,24 @@ public class CNFSatInstance
         int[] negOccurrences = occurrenceMap[negPosition];
         boolean hadEmptyClause = hasEmptyClause;
 
+        occurrenceMapChanges.put(posPosition, copyOccurrenceMapLine(occurrenceMap[posPosition]));
+        occurrenceMapChanges.put(negPosition, copyOccurrenceMapLine(occurrenceMap[negPosition]));
+
+        occurrenceMap[posPosition] = new int[occurrenceMap[0].length];
+        occurrenceMap[negPosition] = new int[occurrenceMap[0].length];
+
+        int oldShortestClauseLength = shortestClauseLength;
         for(int clause : negOccurrences){
             if (clause ==  0)
                 break;
-            occurrenceMapChanges.put(clause, copyArray(clauses[clause - 1]));
+
+            clausesChanges.put(clause, copyArray(clauses[clause - 1]));
             for(int i = 0; i < maxClauseSize; i++){
-                if(clauses[clause - 1][i] == -var)
+                if(clauses[clause - 1][i] == -var){
                     clauses[clause - 1][i] = 0;
+                    if(sizeClause(clauses[clause - 1]) == this.shortestClauseLength)
+                        shortestClauseLength--;
+                }
             }
             if(sizeClause(clauses[clause - 1]) == 0){
                 hasEmptyClause = true;
@@ -250,12 +264,6 @@ public class CNFSatInstance
 
         knownAssignmentsChanges = knownAssignments[Math.abs(var) - 1];
         knownAssignments[Math.abs(var) - 1] = var > 0 ? 1 : -1;
-
-        occurrenceMapChanges.put(posPosition, copyOccurrenceMapLine(occurrenceMap[posPosition]));
-        occurrenceMapChanges.put(negPosition, copyOccurrenceMapLine(occurrenceMap[negPosition]));
-
-        occurrenceMap[posPosition] = new int[occurrenceMap[0].length];
-        occurrenceMap[negPosition] = new int[occurrenceMap[0].length];
 
         occurrenceNumsChanges.put(posPosition, occurrenceNums[posPosition]);
         occurrenceNumsChanges.put(negPosition, occurrenceNums[negPosition]);
@@ -266,17 +274,21 @@ public class CNFSatInstance
 
         previousStates.push(new History(knownAssignmentsChanges, lastGivenVar,
                 clausesChanges, occurrenceMapChanges,
-                occurrenceNumsChanges, deletedChanges, hadEmptyClause, unsatisfiedClausesChanges));
+                occurrenceNumsChanges, deletedChanges, hadEmptyClause, unsatisfiedClausesChanges, oldShortestClauseLength));
     }
 
     public void undoChanges(){
         History previousState = previousStates.pop();
+
+        shortestClauseLength = previousState.getShortestClauseLength();
+
         knownAssignments[Math.abs(previousState.getLastGivenVar()) - 1] = previousState.getKnownAssignmentsChanges();
+
         int posPosition = previousState.getLastGivenVar() > 0? previousState.getLastGivenVar() - 1 : -previousState.getLastGivenVar()+ numVars - 1;
         int negPosition = previousState.getLastGivenVar() > 0 ? previousState.getLastGivenVar() + numVars - 1 : -previousState.getLastGivenVar() - 1;
 
-        occurrenceMap[posPosition] = previousState.getOccurrenceMapChanges().get(posPosition);
-        occurrenceMap[negPosition] = previousState.getOccurrenceMapChanges().get(negPosition);
+        occurrenceMap[posPosition] = copyOccurrenceMapLine(previousState.getOccurrenceMapChanges().get(posPosition));
+        occurrenceMap[negPosition] = copyOccurrenceMapLine(previousState.getOccurrenceMapChanges().get(negPosition));
 
         occurrenceNums[posPosition] = previousState.getOccurrenceNumsChanges().get(posPosition);
         occurrenceNums[negPosition] = previousState.getOccurrenceNumsChanges().get(negPosition);
@@ -289,64 +301,24 @@ public class CNFSatInstance
         for(int clause : negOccurrences){
             if (clause == 0)
                 break;
-            clauses[clause-1] = previousState.getOccurrenceMapChanges().get(clause);
+            clauses[clause-1] = copyArray(previousState.getClausesChanges().get(clause));
         }
 
         hasEmptyClause = previousState.hadEmptyClauses();
+
         for(Integer i : previousState.getUnsatisfiedClausesChanges())
             unsatisfiedClauses.add(i);
+    }
+
+    public Stack<History> getPreviousStates() {
+        return previousStates;
     }
 
     public void undoAllChanges(){
         while(!previousStates.isEmpty())
             undoChanges();
     }
-			/*public CNFSatInstance givenVarOccur(int var){
 
-				int posPosition = var > 0? var - 1 : -var + numVars - 1;
-				int negPosition = var > 0 ? var + numVars - 1 : -var - 1;
-				long started = System.nanoTime();
-
-				int[] newKnownAssignments = copyArray(knownAssignments);
-				newKnownAssignments[Math.abs(var) - 1] = var > 0 ? 1 : -1; 
-				
-				int[][] newOccurrenceMap = copyOccurrenceMap(occurrenceMap);
-				newOccurrenceMap[posPosition] = new int[newOccurrenceMap[0].length];
-				newOccurrenceMap[negPosition] = new int[newOccurrenceMap[0].length];
-				
-				int[] newOccurrenceNums = copyArray(occurrenceNums);
-				newOccurrenceNums[posPosition] = 0;
-				newOccurrenceNums[negPosition] = 0;
-				
-				int[] posOccurrences = occurrenceMap[posPosition];
-				
-				int[] newDeleted = copyArray(deleted);
-		    	for(int clause: posOccurrences){
-		    		if (clause == 0)
-		    			break;
-		    		newDeleted[clause-1] = 1;
-		    	}
-		    		
-		    	
-		    	int[] negOccurrences = occurrenceMap[negPosition];
-		    	
-		    	int[][] newClauses = copy2DArray(clauses);
-				long time = System.nanoTime();
-				long timeTaken = time - started;
-				System.out.println("Time:" + timeTaken/1000000.0 + "ms");
-		    	for(int clause : negOccurrences){
-		    		if (clause == 0)
-		    			break;
-		    		for(int i = 0; i < 3; i++){
-		    			if(newClauses[clause - 1][i] == -var)
-		    				newClauses[clause - 1][i] = 0;
-		    		}
-		    	}
-		    	
-		    	
-		    	return new CNFSatInstance(newClauses, numVars, newOccurrenceMap, newOccurrenceNums, newDeleted, newKnownAssignments);
-		    }
-			*/
     /**
      * Removes a unit clause from the formula
      */
@@ -378,7 +350,6 @@ public class CNFSatInstance
                 break;
             }
             else if(occurrenceNums[i] != 0 && occurrenceNums[i + numVars] == 0){
-                System.out.println(i + 1);
                 givenVarMutator(i + 1);
                 break;
             }
@@ -390,7 +361,7 @@ public class CNFSatInstance
 
 
     public void simplify(){
-        int initialStackSize = previousStates.size();
+        numUndoSimplify.push(previousStates.size());
         boolean changesMade = true;
 
         while(changesMade){
@@ -407,13 +378,13 @@ public class CNFSatInstance
 //		    		System.out.println(changesMade);
         }
 
-        undoStackNum = previousStates.size() - initialStackSize;
     }
 
 
     public void undoSimplify(){
-        while(undoStackNum > 0){
-            undoStackNum--;
+        int previousStackSize = numUndoSimplify.pop();
+
+        while(previousStates.size() > previousStackSize){
             undoChanges();
         }
     }
@@ -478,6 +449,19 @@ public class CNFSatInstance
                 ret += "\n";
             }
         }
+        return ret;
+    }
+
+    public int getSmallestClause(){
+        int ret = -1;
+        for(int i = 0; i < clauses.length; i++ )
+            if(deleted[i] != 1){
+                int smallest = sizeClause(clauses[i]);
+                ret = i;
+                if(smallest == shortestClauseLength)
+                    break;
+            }
+        ret = ret == -1 ? new Random().nextInt(clauses.length) : ret;
         return ret;
     }
 
@@ -814,6 +798,13 @@ public class CNFSatInstance
 class History{
     int knownAssignmentsChanges = 0;
     int lastGivenVar = 0;
+    int shortestClauseLength = 0;
+    public int getShortestClauseLength() {
+        return shortestClauseLength;
+    }
+    public void setShortestClauseLength(int shortestClauseLength) {
+        this.shortestClauseLength = shortestClauseLength;
+    }
     Map<Integer,int[]> clausesChanges = null;
     Map<Integer, int[]> occurrenceMapChanges = null;
     Map<Integer, Integer> occurrenceNumsChanges = null;
@@ -826,7 +817,7 @@ class History{
                    Map<Integer, int[]> occurrenceMapChanges,
                    Map<Integer, Integer> occurrenceNumsChanges,
                    List<Integer> deletedChanges, boolean hadEmptyClauses,
-                   List<Integer> unsatisfiedClausesChanges) {
+                   List<Integer> unsatisfiedClausesChanges, int shortestClauseLength) {
         super();
         this.knownAssignmentsChanges = knownAssignmentsChanges;
         this.lastGivenVar = lastGivenVar;
@@ -836,6 +827,7 @@ class History{
         this.deletedChanges = deletedChanges;
         this.hadEmptyClauses = hadEmptyClauses;
         this.unsatisfiedClausesChanges = unsatisfiedClausesChanges;
+        this.shortestClauseLength = shortestClauseLength;
     }
     public int getKnownAssignmentsChanges() {
         return knownAssignmentsChanges;

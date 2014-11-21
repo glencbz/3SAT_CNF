@@ -2,6 +2,7 @@ package ProfilingStuff;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class CNFparser
@@ -18,7 +19,7 @@ public class CNFparser
 				problemLine = in.nextLine();
 			}
 			//process the problem line
-			String[] params = problemLine.split("\\s");
+			String[] params = problemLine.split("\\s+");
 
 			if (!params[0].equals("p"))
 			{
@@ -36,7 +37,7 @@ public class CNFparser
 			int numVars = Integer.parseInt(params[2]);
 			int numClauses = Integer.parseInt(params[3]);
 			//create an array to hold the clauses for 3 SAT
-			int[][] clauses = new int[numClauses][3];
+			int[][] clauses = new int[numClauses][numClauses];
 			int clauseCount = 0;
 			int currentClauseCount = 0;
 			int literal = 0;
@@ -65,9 +66,11 @@ public class CNFparser
 						}
 						else
 						{
+
+							clauses[clauseCount][currentClauseCount] = literal;
+							currentClauseCount++;
 							try{
-								clauses[clauseCount][currentClauseCount] = literal;
-								currentClauseCount++;
+
 							}catch(ArrayIndexOutOfBoundsException e){
 								System.out.println(e);
 								System.out.println("Number of literals did not match 3 SAT.");

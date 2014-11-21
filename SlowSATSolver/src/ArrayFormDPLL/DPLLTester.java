@@ -13,8 +13,8 @@ public class DPLLTester {
 
 
 
-//                CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/largeSat.cnf");
-            CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/aim-50-1_6-yes1-4.cnf");
+                CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/sat1.cnf");
+//            CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/aim-50-1_6-yes1-4.cnf");
 //        CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/generated2SAT.cnf");
 //        CNFSatInstance testInstance = CNFparser.parseDimacsCnfFile("src/sat/s8SatSmaller.cnf");
 
